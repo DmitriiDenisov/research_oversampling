@@ -8,6 +8,7 @@
 - [ ] Visualization of previous point
 
 ## Materials on SMOTE
+
 https://basegroup.ru/community/articles/imbalance-datasets
 
 https://youtu.be/FheTDyCwRdE
