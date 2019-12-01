@@ -1,6 +1,17 @@
 ## Oversampling research
 
 ## TODO:
+[ ] How to make random variable with Gamma Distribution
+[ ] How to generate random variable with Gamma Distribution on a section
+[ ] Generate Random Variable for two points on plane
+[ ] Visualization of previous point
+
+## Materials on SMOTE
+
+https://basegroup.ru/community/articles/imbalance-datasets
+
+https://youtu.be/FheTDyCwRdE
+
 
 ## Issues:
 
