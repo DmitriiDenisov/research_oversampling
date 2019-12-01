@@ -1,6 +1,7 @@
 ## Oversampling research
 
 ## TODO:
+- [ ] Draw graphs of Gamma Distribution in Desmos, examine parameters
 - [ ] How to make random variable with Gamma Distribution
 - [ ] How to generate random variable with Gamma Distribution on a section
 - [ ] Generate Random Variable for two points on plane
