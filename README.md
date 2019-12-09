@@ -1,7 +1,12 @@
 ## Oversampling research
 
 ## TODO:
-- [ ] Draw graphs of Gamma Distribution in Desmos, examine parameters
+- [x] Draw graphs of Gamma Distribution in Desmos, examine parameters
+
+https://www.desmos.com/calculator/gxk5zydswy
+
+As a test values `k=1` and `thehta=3` will be taken 
+
 - [ ] How to make random variable with Gamma Distribution
 - [ ] How to generate random variable with Gamma Distribution on a section
 - [ ] Generate Random Variable for two points on plane
