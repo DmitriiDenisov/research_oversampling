@@ -21,11 +21,17 @@ Available in `Research_gamma.ipynb`
 
 Available in `Research_gamma.ipynb`
 
-- [x] Visualization of previous point
+- [x] Generate multiple points for two points on 2D
+
+Available in `Research_gamma.ipynb`
+
+- [x] Visualization for above on 2D
 
 Available in `Research_gamma.ipynb`
 
 - [ ] Generate new point for two points for n dimentional space
+
+- [ ] Generate multiple points for two points for n dimentional space
 
 - [ ] Generalize this approach for n minority points for n dimentional space
 
