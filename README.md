@@ -11,9 +11,21 @@ As a test values `k=1` and `thehta=3` will be taken
 
 Available in `Research Gamma Dist.ipynb`
 
-- [ ] How to generate random variable with Gamma Distribution on a section
-- [ ] Generate Random Variable for two points on plane
-- [ ] Visualization of previous point
+- [x] How to generate random variable with Gamma Distribution on a section
+
+Available in `Research_gamma.ipynb`
+
+- [x] Generate new point for two points on 2D
+
+Available in `Research_gamma.ipynb`
+
+- [x] Visualization of previous point
+
+Available in `Research_gamma.ipynb`
+
+- [ ] Generate new point for two points for n dimentional space
+
+- [ ] Generalize this approach for n minority points for n dimentional space
 
 ## Materials on SMOTE
 
