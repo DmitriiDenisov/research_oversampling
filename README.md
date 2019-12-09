@@ -9,8 +9,9 @@ As a test values `k=1` and `thehta=3` will be taken
 
 - [x] How to make random variable with Gamma Distribution
 
+
 Available in `Research Gamma Dist.ipynb`
-However still question about section, because Gamma distribution generates random variable on $[0;+oo]$ meanwhile we need only for [0;1]
+However still question about section, because Gamma distribution generates random variable on [0;+oo] meanwhile we need only for [0;1]
 
 - [x] How to generate random variable with Gamma Distribution on a section
 
