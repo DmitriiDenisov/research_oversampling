@@ -7,7 +7,10 @@ https://www.desmos.com/calculator/gxk5zydswy
 
 As a test values `k=1` and `thehta=3` will be taken 
 
-- [ ] How to make random variable with Gamma Distribution
+- [x] How to make random variable with Gamma Distribution
+
+Available in `Research Gamma Dist.ipynb`
+
 - [ ] How to generate random variable with Gamma Distribution on a section
 - [ ] Generate Random Variable for two points on plane
 - [ ] Visualization of previous point
