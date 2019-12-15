@@ -25,7 +25,7 @@ However still question about section, because Gamma distribution generates rando
 
 - [x] Generate new point for two points for n dimentional space
 
-- [ ] Generate multiple points for two points for n dimentional space
+- [x] Generate multiple points for two points for n dimentional space
 
 - [ ] Generalize this approach for n minority points for n dimentional space
 
