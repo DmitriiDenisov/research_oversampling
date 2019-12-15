@@ -15,21 +15,15 @@ However still question about section, because Gamma distribution generates rando
 
 - [x] How to generate random variable with Gamma Distribution on a section
 
-Available in `Research_gamma.ipynb`
-
 - [x] Generate new point for two points on 2D
-
-Available in `Research_gamma.ipynb`
 
 - [x] Generate multiple points for two points on 2D
 
-Available in `Research_gamma.ipynb`
-
 - [x] Visualization for above on 2D
 
-Available in `Research_gamma.ipynb`
+- [x] Write test function for testing whether three points are on one line or not
 
-- [ ] Generate new point for two points for n dimentional space
+- [x] Generate new point for two points for n dimentional space
 
 - [ ] Generate multiple points for two points for n dimentional space
 
