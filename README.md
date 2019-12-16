@@ -28,6 +28,7 @@ However still question about section, because Gamma distribution generates rando
 - [x] Generate multiple points for two points for n dimentional space
 
 - [x] Generalize this approach for n minority points for n dimentional space
+
 Currently: randomly choose any two minority points, generate new point on the line between than. Repeat this process n times. Selected pair of minority points can repeat
 
 - [ ] Implement another approach for Gamma distribution when there is probability to generate new point on the other side
