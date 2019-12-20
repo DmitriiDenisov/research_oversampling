@@ -40,6 +40,11 @@ https://basegroup.ru/community/articles/imbalance-datasets
 https://youtu.be/FheTDyCwRdE
 
 
-## Issues:
+## Possible issues:
 
+1. 
+Problem:
 `from imblearn.datasets import fetch_datasets` does not work for me as inside it fails in importing `from sklearn.utils.fixes import makedirs`
+Solution:
+Forcing `pip install imbalanced-learn==0.5.0`. The problem was observed on 0.4 version
+
