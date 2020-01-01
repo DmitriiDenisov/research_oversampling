@@ -5,13 +5,13 @@ from utils.utils import get_dataset_pd, aug_train
 print(imblearn.__version__)
 from sklearn.model_selection import train_test_split
 from sklearn.ensemble import RandomForestClassifier
-from sklearn.metrics import f1_score, precision_score, recall_score
+from sklearn.metrics import f1_score, precision_score, recall_score, average_precision_score
 
 # 1. Get dataset:
 X, y = get_dataset_pd('abalone')
 
 # 2. Split on test and train
-X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2) # random_state=42
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2)  # random_state=42
 
 # 3. Fit:
 clf = RandomForestClassifier(n_estimators=50)
@@ -22,8 +22,10 @@ y_pred = clf.predict(X_test)
 print(f1_score(y_test.to_numpy().flatten(), y_pred))
 print(precision_score(y_test.to_numpy().flatten(), y_pred))
 print(recall_score(y_test.to_numpy().flatten(), y_pred))
+print(average_precision_score(y_test.to_numpy().flatten(), y_pred))
 
 # ------------------------------------
+print('---------------------------')
 
 # 1. Get dataset:
 X, y = get_dataset_pd('abalone')
@@ -53,3 +55,4 @@ y_pred = clf.predict(X_test)
 print(f1_score(y_test, y_pred))
 print(precision_score(y_test, y_pred))
 print(recall_score(y_test, y_pred))
+print(average_precision_score(y_test.to_numpy().flatten(), y_pred))
