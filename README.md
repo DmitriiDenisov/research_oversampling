@@ -33,6 +33,16 @@ Currently: randomly choose any two minority points, generate new point on the li
 
 - [x] Implement another approach for Gamma distribution when there is probability to generate new point on the other side
 
+- [ ] Add cross-validation
+
+- [ ] Add loop over all datasets and creating resulting DataFrame
+
+- [ ] Debug code to check the quality improvement 
+
+- [ ] Add realisation of SMOTE in order to compare
+
+
+
 ## Materials on SMOTE
 
 https://basegroup.ru/community/articles/imbalance-datasets
