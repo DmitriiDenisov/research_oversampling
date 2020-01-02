@@ -41,6 +41,7 @@ Currently: randomly choose any two minority points, generate new point on the li
 
 - [ ] Add realisation of SMOTE in order to compare
 
+- [ ] Add to statistics dataframe number of elements and percantage of minority class
 
 
 ## Materials on SMOTE
