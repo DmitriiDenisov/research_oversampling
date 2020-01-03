@@ -19,6 +19,5 @@ def test_3(capsys, caplog):
 
 
 def test_4(capsys, caplog):
-    handle_dataset('abalone', False)
-    handle_dataset('abalone', True)
-    # os.system('python3 handle_dataset.py')
+    handle_dataset('abalone', dict(), False, num_folds=5)
+    handle_dataset('abalone', dict(), True, num_folds=5)
