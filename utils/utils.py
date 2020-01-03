@@ -5,6 +5,7 @@ import pandas as pd
 import numpy as np
 
 from imblearn.datasets import fetch_datasets
+from sklearn.metrics import f1_score, precision_score, recall_score, average_precision_score
 
 from utils.tests_utils import test_points_on_line
 
@@ -28,6 +29,33 @@ def generate_gamma():
         s = 20
     s = s / 20
     return s
+
+
+def get_metrics(y_test, y_pred, aug_data, print_metrics=False):
+    f1 = f1_score(y_test.to_numpy().flatten(), y_pred)
+    pr = precision_score(y_test.to_numpy().flatten(), y_pred, zero_division=0)
+    re = recall_score(y_test.to_numpy().flatten(), y_pred)
+    auc_pr = average_precision_score(y_test.to_numpy().flatten(), y_pred)
+
+    if aug_data:
+        dict_ans = {'f1_score_gamma': 0 if f1 is None else f1,
+                    'precision_gamma': 0 if pr is None else pr,
+                    'recall_gamma': 0 if re is None else re,
+                    'AUC_PR_gamma': 0 if auc_pr is None else auc_pr}
+    else:
+        dict_ans = {'f1_score': 0 if f1 is None else f1,
+                    'precision': 0 if pr is None else pr,
+                    'recall': 0 if re is None else re,
+                    'AUC_PR': 0 if auc_pr is None else auc_pr}
+
+    if print_metrics:
+        print('F1_Score:', f1)
+        print('Precision:', pr)
+        print('Recall:', re)
+        print('AUC_PR:', auc_pr)
+    # ans = np.array([f1, pr, re, auc_pr])
+    # ans[np.isnan(ans)] = 0
+    return dict_ans
 
 
 # Generates new point on line between two initial points

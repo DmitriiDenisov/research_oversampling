@@ -3,6 +3,8 @@
 import pytest
 import os
 
+from handle_dataset import handle_dataset
+
 
 def test_1(capsys, caplog):
     os.system('python3 for_tests/multiple_random_point_ND_generalized.py')
@@ -17,4 +19,6 @@ def test_3(capsys, caplog):
 
 
 def test_4(capsys, caplog):
-    os.system('python3 main.py')
+    handle_dataset('abalone', False)
+    handle_dataset('abalone', True)
+    # os.system('python3 handle_dataset.py')

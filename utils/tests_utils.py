@@ -21,7 +21,7 @@ def test_points_on_line_old(p1, p2, list_p3, tol=10):
     return True
 
 
-def test_points_on_line(p1, p2, list_p3, tol=0.000000000001):
+def test_points_on_line(p1, p2, list_p3, tol=0.00000000001):
     # Calculate two vectors and check if they are collinear
     if len(list_p3.shape) == 1:
         list_p3 = list_p3[np.newaxis, :]

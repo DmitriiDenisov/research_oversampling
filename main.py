@@ -1,58 +1,42 @@
-import imblearn
+from handle_dataset import handle_dataset
+import pandas as pd
 
-from utils.utils import get_dataset_pd, aug_train
+from utils.utils import get_dataset_pd
 
-print(imblearn.__version__)
-from sklearn.model_selection import train_test_split
-from sklearn.ensemble import RandomForestClassifier
-from sklearn.metrics import f1_score, precision_score, recall_score, average_precision_score
+datasets = ['ecoli', 'satimage', 'abalone', 'spectrometer', 'yeast_ml8', 'scene', 'libras_move', 'wine_quality',
+            'letter_img', 'yeast_me2', 'ozone_level', 'mammography']
+# datasets = ['satimage']
 
-# 1. Get dataset:
-X, y = get_dataset_pd('abalone')
+df_result = pd.DataFrame(
+    columns=['NAME_Dataset', 'NUM_elements', 'minority_perc', 'NUM_fails', 'f1_score', 'precision', 'recall', 'AUC_PR',
+             'NUM_fails_gamma', 'f1_score_gamma', 'precision_gamma', 'recall_gamma',
+             'AUC_PR_gamma'])
+INITIAL_FOLDS = 5
 
-# 2. Split on test and train
-X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2)  # random_state=42
+for dataset in datasets:
+    print(dataset)
+    X_temp, y = get_dataset_pd(dataset)
+    X_temp['y'] = y
+    num_zeros = X_temp[X_temp['y'] == 0].to_numpy().shape[0]
+    num_ones = X_temp[X_temp['y'] == 1].to_numpy().shape[0]
 
-# 3. Fit:
-clf = RandomForestClassifier(n_estimators=50)
-clf.fit(X_train, y_train.to_numpy().flatten())
+    dict_metrics_1, num_folds = handle_dataset(dataset, dict(), False, num_folds=INITIAL_FOLDS)
+    dict_metrics_2, num_folds_gamma = handle_dataset(dataset, dict(), True, num_folds=INITIAL_FOLDS)
 
-# 4. Predict and metrics:
-y_pred = clf.predict(X_test)
-print(f1_score(y_test.to_numpy().flatten(), y_pred))
-print(precision_score(y_test.to_numpy().flatten(), y_pred))
-print(recall_score(y_test.to_numpy().flatten(), y_pred))
-print(average_precision_score(y_test.to_numpy().flatten(), y_pred))
+    dict_metrics = {k: dict_metrics_1.get(k, 0) + dict_metrics_2.get(k, 0) for k in
+                    set(dict_metrics_1) | set(dict_metrics_2)}
 
-# ------------------------------------
-print('---------------------------')
+    dict_metrics['NAME_Dataset'] = dataset
+    dict_metrics['NUM_elements'] = X_temp.shape[0]
+    dict_metrics['minority_perc'] = num_ones / (num_ones + num_zeros)
+    dict_metrics['NUM_fails'] = INITIAL_FOLDS - num_folds
+    dict_metrics['NUM_fails_gamma'] = INITIAL_FOLDS - num_folds_gamma
 
-# 1. Get dataset:
-X, y = get_dataset_pd('abalone')
+    assert df_result.shape[1] == len(dict_metrics.keys()) or \
+           (dict_metrics['NUM_fails'] == dict_metrics['NUM_fails_gamma'])
+    assert set(df_result.columns) == set(dict_metrics.keys()) or \
+           (dict_metrics['NUM_fails'] == dict_metrics['NUM_fails_gamma'])
+    df_result = df_result.append(dict_metrics, ignore_index=True)
 
-X['y'] = y
-
-# 2. Split on test and train
-X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2)  # random_state=42
-X_test = X_test.drop('y', 1)
-
-# 3. Augment train part by generating new minority points
-X_train_aug = aug_train(X_train)
-
-# 4. Shuffle
-X_train_aug = X_train_aug.sample(frac=1)  # shuffle
-
-# 5. Drop target from train
-y_train_aug = X_train_aug['y']
-X_train_aug = X_train_aug.drop('y', 1)
-
-# 6. Fit:
-clf = RandomForestClassifier(n_estimators=50)
-clf.fit(X_train_aug, y_train_aug.to_numpy().flatten())
-
-# 7. Predict and metrics:
-y_pred = clf.predict(X_test)
-print(f1_score(y_test, y_pred))
-print(precision_score(y_test, y_pred))
-print(recall_score(y_test, y_pred))
-print(average_precision_score(y_test.to_numpy().flatten(), y_pred))
+# print(df_result)
+df_result.to_excel("output.xlsx", index=False)
