@@ -33,15 +33,15 @@ Currently: randomly choose any two minority points, generate new point on the li
 
 - [x] Implement another approach for Gamma distribution when there is probability to generate new point on the other side
 
-- [ ] Add cross-validation
+- [x] Add cross-validation
 
-- [ ] Add loop over all datasets and creating resulting DataFrame
+- [x] Add loop over all datasets and creating resulting DataFrame
 
 - [ ] Debug code to check the quality improvement 
 
 - [ ] Add realisation of SMOTE in order to compare
 
-- [ ] Add to statistics dataframe number of elements and percantage of minority class
+- [x] Add to statistics dataframe number of elements and percantage of minority class
 
 
 ## Materials on SMOTE
