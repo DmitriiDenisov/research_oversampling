@@ -44,6 +44,7 @@ Currently: randomly choose any two minority points, generate new point on the li
 - [x] Add to statistics dataframe number of elements and percantage of minority class
 
 
+
 ## Materials on SMOTE
 
 https://basegroup.ru/community/articles/imbalance-datasets
