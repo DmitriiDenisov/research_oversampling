@@ -42,7 +42,7 @@ Currently: randomly choose any two minority points, generate new point on the li
 - [ ] Understand how is implemeted SMOTE in `imblearn` library:
 https://imbalanced-learn.readthedocs.io/en/stable/generated/imblearn.over_sampling.SMOTE.html
 
-- [ ] Add implementation of k_neighbours parameter for Gamma dist
+- [x] Add implementation of k_neighbours parameter for Gamma dist
 
 - [ ] Add realisation of SMOTE in order to compare
 
