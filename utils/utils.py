@@ -11,6 +11,14 @@ from sklearn.neighbors import NearestNeighbors
 from utils.tests_utils import test_points_on_line
 
 
+def add_metainfo_dataset(dict_metrics, dataset, num_ones, num_zeros, aug_data):
+    dict_metrics['NAME_Dataset'] = '{}_{}'.format(dataset, aug_data)
+    dict_metrics['NUM_elements'] = num_ones + num_zeros
+    dict_metrics['minority_perc'] = num_ones / (num_ones + num_zeros)
+    dict_metrics['Generated_points'] = num_zeros - num_ones
+    return dict_metrics
+
+
 def distance(x1, x2):
     return np.linalg.norm(x1 - x2)
 
@@ -42,6 +50,11 @@ def get_metrics(y_test, y_pred, aug_data, print_metrics=False):
     re = recall_score(y_test.to_numpy().flatten(), y_pred)
     auc_pr = average_precision_score(y_test.to_numpy().flatten(), y_pred)
 
+    dict_ans = {'f1_score': 0 if f1 is None else f1,
+                'precision': 0 if pr is None else pr,
+                'recall': 0 if re is None else re,
+                'AUC_PR': 0 if auc_pr is None else auc_pr}
+    """
     if aug_data == 'gamma':
         dict_ans = {'f1_score_gamma': 0 if f1 is None else f1,
                     'precision_gamma': 0 if pr is None else pr,
@@ -57,6 +70,7 @@ def get_metrics(y_test, y_pred, aug_data, print_metrics=False):
                     'precision_smote': 0 if pr is None else pr,
                     'recall_smote': 0 if re is None else re,
                     'AUC_PR_smote': 0 if auc_pr is None else auc_pr}
+    """
 
     if print_metrics:
         print('F1_Score:', f1)

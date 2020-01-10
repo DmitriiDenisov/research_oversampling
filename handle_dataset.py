@@ -84,7 +84,7 @@ def handle_dataset(X: np.array, y: np.array, dict_metrics: dict, aug_data: str, 
             dict_metrics = {k: dict_metrics.get(k, 0) + dict_temp.get(k, 0) for k in set(dict_metrics) | set(dict_temp)}
         if num_folds:  # in case every k-fold does not have at least two minority points
             dict_metrics = {k: v / num_folds for k, v in dict_metrics.items()}
-        dict_metrics['NUM_fails_gamma'] = initial_folds_num - num_folds
+        dict_metrics['NUM_fails'] = initial_folds_num - num_folds
 
     elif aug_data == 'smote':
         kf = KFold(n_splits=num_folds)
@@ -120,6 +120,6 @@ def handle_dataset(X: np.array, y: np.array, dict_metrics: dict, aug_data: str, 
             dict_metrics = {k: dict_metrics.get(k, 0) + dict_temp.get(k, 0) for k in set(dict_metrics) | set(dict_temp)}
         if num_folds:  # in case every k-fold does not have at least two minority points
             dict_metrics = {k: v / num_folds for k, v in dict_metrics.items()}
-        dict_metrics['NUM_fails_smote'] = initial_folds_num - num_folds
+        dict_metrics['NUM_fails'] = initial_folds_num - num_folds
 
     return dict_metrics, num_folds
