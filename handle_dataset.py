@@ -1,23 +1,26 @@
-from utils.utils import get_dataset_pd, aug_train, get_metrics
-
+from sklearn.neighbors import NearestNeighbors
 import numpy as np
 
+from utils.utils import get_dataset_pd, aug_train, get_metrics
 from sklearn.model_selection import KFold
 from sklearn.ensemble import RandomForestClassifier
 
 
-def handle_dataset(name_dataset: str, dict_metrics: dict, aug_data: bool, num_folds=5):
+def handle_dataset(X: np.array, y: np.array, dict_metrics: dict, aug_data: bool, num_folds=5, n_neighbours=5):
     """
 
-    :param name_dataset: str
+    :param X:
+    :param y:
     :param dict_metrics:
     :param aug_data:
     :param num_folds:
+    :param n_neighbours:
     :return:
     """
+
     if not aug_data:
         # 1. Get dataset:
-        X, y = get_dataset_pd(name_dataset)
+        # X, y = get_dataset_pd(name_dataset)
         kf = KFold(n_splits=num_folds)
         kf.get_n_splits(X)
 
@@ -44,7 +47,7 @@ def handle_dataset(name_dataset: str, dict_metrics: dict, aug_data: bool, num_fo
         # dict(list(dict_metrics.items()) + list(dict('pr').items()))
     else:
         # 1. Get dataset:
-        X, y = get_dataset_pd(name_dataset)
+        # X, y = get_dataset_pd(name_dataset)
         X['y'] = y
         kf = KFold(n_splits=num_folds)
         kf.get_n_splits(X)
@@ -59,7 +62,7 @@ def handle_dataset(name_dataset: str, dict_metrics: dict, aug_data: bool, num_fo
             X_test = X_test.drop('y', 1)
 
             # 3. Augment train part by generating new minority points
-            X_train_aug = aug_train(X_train)
+            X_train_aug = aug_train(X_train, n_neighbours)
 
             # 4. Shuffle
             X_train_aug = X_train_aug.sample(frac=1)  # shuffle

@@ -6,8 +6,13 @@ import numpy as np
 
 from imblearn.datasets import fetch_datasets
 from sklearn.metrics import f1_score, precision_score, recall_score, average_precision_score
+from sklearn.neighbors import NearestNeighbors
 
 from utils.tests_utils import test_points_on_line
+
+
+def distance(x1, x2):
+    return np.linalg.norm(x1 - x2)
 
 
 # Generates random point in rectangle [xy_min; xy_max]
@@ -71,23 +76,55 @@ def generate_random_point_nd(num_points=2, n=10, min_=0, max_=10):
     return data
 
 
-def generate_points_for_n_minority(minority_points, num_to_add):
+def generate_points_for_n_minority(minority_points, num_to_add, n_neighbors, tol=0.0000001):
     n_features = minority_points.shape[1]
     dict_ans = defaultdict(lambda: np.array([]).reshape(0, n_features))
-    # Choose random pairs with repetition:
-    all_comb = np.array(list(itertools.combinations(range(len(minority_points)), r=2)))
-    rand_idx = np.random.choice(range(len(all_comb)), num_to_add, replace=True)
-    assert rand_idx.shape == (num_to_add,)
-    # print(rand_idx)
-    # print(all_comb)
-    all_comb = all_comb[rand_idx]
+
+    if n_neighbors != -1:
+        neigh = NearestNeighbors()
+        neigh.fit(minority_points)
+        all_picked_x = np.random.randint(minority_points.shape[0], size=num_to_add)
+        dist, all_neighs = neigh.kneighbors(minority_points[all_picked_x, :],
+                                            n_neighbors, return_distance=True)
+        assert dist.shape[0] == num_to_add and all_neighs.shape[0] == num_to_add and len(all_picked_x) == num_to_add
+        dist, all_neighs = dist[:, 1:], all_neighs[:, 1:]
+        # assert np.all(dist > 0)
+        #   print('Retrain Neighbours')
+        #    dist, all_neighs = neigh.kneighbors(minority_points[all_picked_x, :],
+        #                                        n_neighbors+1, return_distance=True)
+        #    assert dist.shape[0] == num_to_add and all_neighs.shape[0] == num_to_add and len(all_picked_x) == num_to_add
+        #    dist, all_neighs = dist[:, 2:], all_neighs[:, 2:]
+        #    assert np.all(dist > 0)
+
+        all_picked_neighs = np.random.choice(range(len(all_neighs[1])), num_to_add, replace=True)
+        assert len(all_picked_neighs) == num_to_add
+
+        all_pairs = []
+        i = 0
+        for picked_x, picked_neigh in zip(all_picked_x, all_picked_neighs):
+            all_pairs.append([picked_x, all_neighs[i][picked_neigh]])
+            assert abs(
+                distance(minority_points[picked_x], minority_points[all_neighs[i][picked_neigh]]) - dist[i][
+                    picked_neigh]) < tol
+            i += 1
+        all_pairs = np.array(all_pairs)
+        assert all_pairs.shape[0] == num_to_add and all_pairs.shape[1] == 2
+
+    else:
+        # Choose random pairs with repetition:
+        all_pairs = np.array(list(itertools.combinations(range(len(minority_points)), r=2)))
+        rand_idx = np.random.choice(range(len(all_pairs)), num_to_add, replace=True)
+        assert rand_idx.shape == (num_to_add,)
+        # print(rand_idx)
+        # print(all_comb)
+        all_pairs = all_pairs[rand_idx]
     # assert random_choice_minority.shape[0] == num_to_add and random_choice_minority.shape[1] == 2
-    for i, (idx1, idx2) in enumerate(all_comb):
+    for i, (idx1, idx2) in enumerate(all_pairs):
         v = get_vector_two_points([minority_points[idx1], minority_points[idx2]])
         gamma_coeff = generate_gamma()
         generated_point = generate_point_on_line(minority_points[idx1], v, gamma_coeff)
         minority_points = np.concatenate((minority_points, generated_point[np.newaxis, :]), axis=0)
-        dict_ans[tuple(all_comb[i])] = np.vstack([dict_ans[tuple(all_comb[i])], generated_point])
+        dict_ans[tuple(all_pairs[i])] = np.vstack([dict_ans[tuple(all_pairs[i])], generated_point])
 
     return minority_points, dict_ans  # return concatenated initial+generated points and dict for testing
 
@@ -113,7 +150,7 @@ def get_dataset_pd(name):
     return X, target
 
 
-def aug_train(X_temp):
+def aug_train(X_temp, n_neighbors):
     # Подавать внутрь датафрейм X_temp с колонкой y
     num_zeros = X_temp[X_temp['y'] == 0].to_numpy().shape[0]
     num_ones = X_temp[X_temp['y'] == 1].to_numpy().shape[0]
@@ -121,7 +158,7 @@ def aug_train(X_temp):
     num_add = num_zeros - num_ones
     minority_points = X_temp[X_temp['y'] == 1].drop('y', 1).to_numpy()
 
-    minority_points, dict_ans = generate_points_for_n_minority(minority_points, num_add)
+    minority_points, dict_ans = generate_points_for_n_minority(minority_points, num_add, n_neighbors)
     assert minority_points.shape[0] == X_temp[X_temp['y'] == 1].to_numpy().shape[0] + num_add
     assert num_zeros == minority_points.shape[0]
 
