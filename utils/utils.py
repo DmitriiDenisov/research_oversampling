@@ -42,16 +42,21 @@ def get_metrics(y_test, y_pred, aug_data, print_metrics=False):
     re = recall_score(y_test.to_numpy().flatten(), y_pred)
     auc_pr = average_precision_score(y_test.to_numpy().flatten(), y_pred)
 
-    if aug_data:
+    if aug_data == 'gamma':
         dict_ans = {'f1_score_gamma': 0 if f1 is None else f1,
                     'precision_gamma': 0 if pr is None else pr,
                     'recall_gamma': 0 if re is None else re,
                     'AUC_PR_gamma': 0 if auc_pr is None else auc_pr}
-    else:
+    elif aug_data == 'no':
         dict_ans = {'f1_score': 0 if f1 is None else f1,
                     'precision': 0 if pr is None else pr,
                     'recall': 0 if re is None else re,
                     'AUC_PR': 0 if auc_pr is None else auc_pr}
+    elif aug_data == 'smote':
+        dict_ans = {'f1_score_smote': 0 if f1 is None else f1,
+                    'precision_smote': 0 if pr is None else pr,
+                    'recall_smote': 0 if re is None else re,
+                    'AUC_PR_smote': 0 if auc_pr is None else auc_pr}
 
     if print_metrics:
         print('F1_Score:', f1)
