@@ -37,8 +37,6 @@ Currently: randomly choose any two minority points, generate new point on the li
 
 - [x] Add loop over all datasets and creating resulting DataFrame
 
-- [ ] Debug code to check the quality improvement 
-
 - [x] Understand how is implemeted SMOTE in `imblearn` library:
 https://imbalanced-learn.readthedocs.io/en/stable/generated/imblearn.over_sampling.SMOTE.html
 
@@ -47,6 +45,8 @@ https://imbalanced-learn.readthedocs.io/en/stable/generated/imblearn.over_sampli
 - [x] Add realisation of SMOTE in order to compare
 
 - [x] Add to statistics dataframe number of elements and percantage of minority class
+
+- [ ] Debug code to check everything
 
 
 
