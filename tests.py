@@ -1,9 +1,9 @@
 # pytest tests.py -vv
 # pytest tests.py -v
-import pytest
 import os
 
-from handle_dataset import handle_dataset
+from utils.handle_dataset import handle_dataset
+from utils.utils import get_dataset_pd
 
 
 def test_1(capsys, caplog):
@@ -19,5 +19,18 @@ def test_3(capsys, caplog):
 
 
 def test_4(capsys, caplog):
-    handle_dataset('abalone', dict(), False, num_folds=5)
-    handle_dataset('abalone', dict(), True, num_folds=5)
+    dataset = 'abalone'
+    INITIAL_FOLDS = 5
+    N_NEIGH = 5
+    X_temp, y = get_dataset_pd(dataset)
+    X_temp['y'] = y
+    # Drop duplicates:
+    X_temp = X_temp.drop_duplicates()
+    y = X_temp[['y']]
+    dict_metrics, num_folds = handle_dataset(X_temp.drop('y', 1), y, dict(), aug_data='no', num_folds=INITIAL_FOLDS)
+    dict_metrics, num_folds_gamma = handle_dataset(X_temp.drop('y', 1), y, dict(), aug_data='gamma',
+                                                   num_folds=INITIAL_FOLDS,
+                                                   n_neighbours=N_NEIGH)
+    dict_metrics, num_folds_smote = handle_dataset(X_temp.drop('y', 1), y, dict(), aug_data='smote',
+                                                   num_folds=INITIAL_FOLDS,
+                                                   n_neighbours=N_NEIGH)

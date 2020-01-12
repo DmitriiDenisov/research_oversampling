@@ -1,6 +1,5 @@
-from handle_dataset import handle_dataset
+from utils.handle_dataset import handle_dataset
 import pandas as pd
-import numpy as np
 
 from utils.utils import get_dataset_pd, add_metainfo_dataset
 
@@ -46,7 +45,7 @@ for dataset in datasets:
 
     # assert df_result.shape[1] == len(dict_metrics.keys()) or \
     #       (dict_metrics['NUM_fails'] == dict_metrics['NUM_fails_gamma'])
-    #assert set(df_result.columns) == set(dict_metrics.keys()) or \
+    # assert set(df_result.columns) == set(dict_metrics.keys()) or \
     #       (dict_metrics['NUM_fails'] == dict_metrics['NUM_fails_gamma'])
 
 # print(df_result)
