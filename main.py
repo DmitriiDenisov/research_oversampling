@@ -34,8 +34,13 @@ datasets = ['ecoli',
             # 'protein_homo',
             'abalone_19']
 
-#datasets = [
-#    'isolet', ]
+datasets = [
+    'ozone_level',
+    'mammography',
+    'protein_homo'
+    ]
+
+datasets = ['sick_euthyroid']
 
 if path.exists('output.xlsx'):
     df_result = pd.read_excel('output.xlsx', index_col=None)

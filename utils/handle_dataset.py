@@ -55,7 +55,7 @@ def handle_dataset(X: np.array, y: np.array, dict_metrics: dict, aug_data: str, 
         # 1. Get dataset:
         # X, y = get_dataset_pd(name_dataset)
         X['y'] = y
-        kf = KFold(n_splits=num_folds)
+        kf = KFold(n_splits=num_folds, shuffle=True)
         kf.get_n_splits(X)
 
         for train_index, test_index in kf.split(X):
@@ -90,7 +90,7 @@ def handle_dataset(X: np.array, y: np.array, dict_metrics: dict, aug_data: str, 
         dict_metrics['NUM_fails'] = initial_folds_num - num_folds
 
     elif aug_data == 'smote':
-        kf = KFold(n_splits=num_folds)
+        kf = KFold(n_splits=num_folds, shuffle=True)
         kf.get_n_splits(X)
 
         for train_index, test_index in kf.split(X):
