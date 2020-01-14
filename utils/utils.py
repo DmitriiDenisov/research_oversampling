@@ -7,6 +7,7 @@ import numpy as np
 from imblearn.datasets import fetch_datasets
 from sklearn.metrics import f1_score, precision_score, recall_score, average_precision_score
 from sklearn.neighbors import NearestNeighbors
+from tqdm import tqdm
 
 from utils.tests_utils import test_points_on_line
 

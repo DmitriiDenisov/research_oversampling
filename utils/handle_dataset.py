@@ -19,7 +19,7 @@ def handle_dataset(X: np.array, y: np.array, dict_metrics: dict, aug_data: str, 
     :return:
     """
     initial_folds_num = num_folds
-    if aug_data == 'no':
+    if aug_data == 'initial':
         # 1. Get dataset:
         # X, y = get_dataset_pd(name_dataset)
         kf = KFold(n_splits=num_folds)
@@ -29,10 +29,13 @@ def handle_dataset(X: np.array, y: np.array, dict_metrics: dict, aug_data: str, 
             # 2. Split on test and train
             X_train, X_test = X.iloc[train_index], X.iloc[test_index]
             y_train, y_test = y.iloc[train_index], y.iloc[test_index]
+            assert y_train['y'].sum() + y_test['y'].sum() == y['y'].sum()
 
             if y_train['y'].sum() < 2 or y_test['y'].sum() < 2:
                 num_folds -= 1
                 continue
+
+            assert y_train['y'].sum() >= n_neighbours
 
             # 3. Fit
             clf = RandomForestClassifier(n_estimators=50)
