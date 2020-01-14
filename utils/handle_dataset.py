@@ -22,7 +22,7 @@ def handle_dataset(X: np.array, y: np.array, dict_metrics: dict, aug_data: str, 
     if aug_data == 'initial':
         # 1. Get dataset:
         # X, y = get_dataset_pd(name_dataset)
-        kf = KFold(n_splits=num_folds)
+        kf = KFold(n_splits=num_folds, shuffle=True)
         kf.get_n_splits(X)
 
         for train_index, test_index in kf.split(X):
