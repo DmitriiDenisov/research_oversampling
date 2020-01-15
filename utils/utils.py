@@ -5,18 +5,30 @@ import pandas as pd
 import numpy as np
 
 from imblearn.datasets import fetch_datasets
+from keras import Sequential
+from keras.layers import Dense
+from sklearn.ensemble import RandomForestClassifier
 from sklearn.metrics import f1_score, precision_score, recall_score, average_precision_score
 from sklearn.neighbors import NearestNeighbors
+from sklearn.svm import SVC
 from tqdm import tqdm
 
 from utils.tests_utils import test_points_on_line
 
 
-def add_metainfo_dataset(dict_metrics, dataset, num_ones, num_zeros, aug_data):
+def add_metainfo_dataset(dict_metrics, dataset, num_ones, num_zeros, aug_data, n_neigh, algo):
     dict_metrics['NAME_Dataset'] = '{}_{}'.format(dataset, aug_data)
     dict_metrics['NUM_elements'] = num_ones + num_zeros
     dict_metrics['minority_perc'] = num_ones / (num_ones + num_zeros)
     dict_metrics['Generated_points'] = num_zeros - num_ones
+    if isinstance(algo, Sequential):
+        dict_metrics['Algo'] = 'NN'
+    elif isinstance(algo, RandomForestClassifier):
+        dict_metrics['Algo'] = 'RF'
+    elif isinstance(algo, SVC):
+        dict_metrics['Algo'] = 'SVM'
+
+    dict_metrics['N_neigh'] = n_neigh
     return dict_metrics
 
 
@@ -39,9 +51,9 @@ def get_vector_two_points(two_points):
 def generate_gamma():
     shape, scale = 1., 3.
     s = np.random.gamma(shape, scale, 1)[0]
-    if (s > 20):  # заглушка пока что
-        s = 20
-    s = s / 20
+    # if (s > 20):  # заглушка пока что
+    #    s = 20
+    # s = s / 20
     return s
 
 
@@ -141,7 +153,10 @@ def generate_points_for_n_minority(minority_points, num_to_add, n_neighbors, tol
     # assert random_choice_minority.shape[0] == num_to_add and random_choice_minority.shape[1] == 2
     for i, (idx1, idx2) in enumerate(all_pairs):
         v = get_vector_two_points([minority_points[idx1], minority_points[idx2]])
-        gamma_coeff = generate_gamma()
+
+        # gamma_coeff = generate_gamma()
+        gamma_coeff = generate_gamma_negative()
+
         generated_point = generate_point_on_line(minority_points[idx1], v, gamma_coeff)
         minority_points = np.concatenate((minority_points, generated_point[np.newaxis, :]), axis=0)
         dict_ans[tuple(all_pairs[i])] = np.vstack([dict_ans[tuple(all_pairs[i])], generated_point])
@@ -154,12 +169,12 @@ def max_pdf_gamma(k, theta):
 
 
 def generate_gamma_negative():
-    k, theta = 3, 2.1
+    k, theta = 1 / 8, 2.
     s = np.random.gamma(k, theta, 1)[0]
     s = s - max_pdf_gamma(k, theta)  # shift by X axis
-    if (s > 20):  # заглушка пока что
-        s = 20
-    s = s / 20
+    # if (s > 20):  # заглушка пока что
+    #     s = 20
+    # s = s / 20
     return s
 
 
@@ -202,3 +217,14 @@ def aug_train(X_temp, n_neighbors):
     df_new['y'] = y_aug
 
     return df_new
+
+
+def get_NN(X):
+    model = Sequential()
+    model.add(Dense(32, activation='relu', input_dim=X.shape[1]))
+    model.add(Dense(1, activation='sigmoid'))
+    model.compile(optimizer='rmsprop',
+                  loss='binary_crossentropy',
+                  metrics=['accuracy'])
+    # model.fit(X, y, epochs=100, verbose=0)
+    return model
