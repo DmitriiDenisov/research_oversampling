@@ -44,7 +44,7 @@ datasets = ['ecoli',
 #             'mammography',
 #    ]
 
-datasets = ['optical_digits']
+datasets = ['isolet']
 
 if path.exists('output.xlsx'):
     df_result = pd.read_excel('output.xlsx', index_col=None)
