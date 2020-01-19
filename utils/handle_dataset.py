@@ -13,11 +13,16 @@ def handle_dataset(X: np.array,
                    dict_metrics: dict,
                    aug_data: str,
                    clf,
+                   k=1 / 8,
+                   theta=2.,
                    num_folds=5,
                    n_neighbours=5,
                    ) -> object:
     """
 
+    :param clf:
+    :param k:
+    :param theta:
     :param X:
     :param y:
     :param dict_metrics:
@@ -87,7 +92,7 @@ def handle_dataset(X: np.array,
             X_test = X_test.drop('y', 1)
 
             # 3. Augment train part by generating new minority points
-            X_train_aug = aug_train(X_train, n_neighbours)
+            X_train_aug = aug_train(X_train, n_neighbours, k, theta)
 
             # 4. Shuffle
             X_train_aug = X_train_aug.sample(frac=1)  # shuffle

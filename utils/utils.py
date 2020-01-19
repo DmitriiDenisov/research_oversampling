@@ -32,6 +32,28 @@ def add_metainfo_dataset(dict_metrics, dataset, num_ones, num_zeros, aug_data, n
     return dict_metrics
 
 
+def add_metadata(df_result, k, theta, success):
+    # s2 = pd.Series([Nan, Nan, Nan, Nan], index=['A', 'B', 'C', 'D'])
+    # result = df1.append(s2)
+    df_result = df_result.append(pd.Series(), ignore_index=True)
+    dict_temp = dict()
+    dict_temp['NAME_Dataset'] = 'K'
+    dict_temp['Algo'] = k
+    df_result = df_result.append(dict_temp, ignore_index=True)
+
+    dict_temp = dict()
+    dict_temp['NAME_Dataset'] = 'Theta'
+    dict_temp['Algo'] = theta
+    df_result = df_result.append(dict_temp, ignore_index=True)
+
+    dict_temp = dict()
+    dict_temp['NAME_Dataset'] = 'Number of success'
+    dict_temp['Algo'] = success
+    df_result = df_result.append(dict_temp, ignore_index=True)
+
+    return df_result
+
+
 def distance(x1, x2):
     return np.linalg.norm(x1 - x2)
 
@@ -108,7 +130,7 @@ def generate_random_point_nd(num_points=2, n=10, min_=0, max_=10):
     return data
 
 
-def generate_points_for_n_minority(minority_points, num_to_add, n_neighbors, tol=0.0000001):
+def generate_points_for_n_minority(minority_points, num_to_add, n_neighbors, k, theta, tol=0.0000001):
     n_features = minority_points.shape[1]
     dict_ans = defaultdict(lambda: np.array([]).reshape(0, n_features))
 
@@ -155,7 +177,7 @@ def generate_points_for_n_minority(minority_points, num_to_add, n_neighbors, tol
         v = get_vector_two_points([minority_points[idx1], minority_points[idx2]])
 
         # gamma_coeff = generate_gamma()
-        gamma_coeff = generate_gamma_negative()
+        gamma_coeff = generate_gamma_negative(k=k, theta=theta)
 
         generated_point = generate_point_on_line(minority_points[idx1], v, gamma_coeff)
         minority_points = np.concatenate((minority_points, generated_point[np.newaxis, :]), axis=0)
@@ -168,8 +190,7 @@ def max_pdf_gamma(k, theta):
     return (k - 1) * theta
 
 
-def generate_gamma_negative():
-    k, theta = 1 / 8, 2.
+def generate_gamma_negative(k=1 / 8, theta=2.):
     s = np.random.gamma(k, theta, 1)[0]
     s = s - max_pdf_gamma(k, theta)  # shift by X axis
     # if (s > 20):  # заглушка пока что
@@ -185,7 +206,7 @@ def get_dataset_pd(name):
     return X, target
 
 
-def aug_train(X_temp, n_neighbors):
+def aug_train(X_temp, n_neighbors, k, theta):
     # Подавать внутрь датафрейм X_temp с колонкой y
     num_zeros = X_temp[X_temp['y'] == 0].to_numpy().shape[0]
     num_ones = X_temp[X_temp['y'] == 1].to_numpy().shape[0]
@@ -193,7 +214,7 @@ def aug_train(X_temp, n_neighbors):
     num_add = num_zeros - num_ones
     minority_points = X_temp[X_temp['y'] == 1].drop('y', 1).to_numpy()
 
-    minority_points, dict_ans = generate_points_for_n_minority(minority_points, num_add, n_neighbors)
+    minority_points, dict_ans = generate_points_for_n_minority(minority_points, num_add, n_neighbors, k, theta)
     assert minority_points.shape[0] == X_temp[X_temp['y'] == 1].to_numpy().shape[0] + num_add
     assert num_zeros == minority_points.shape[0]
 
@@ -228,3 +249,19 @@ def get_NN(X):
                   metrics=['accuracy'])
     # model.fit(X, y, epochs=100, verbose=0)
     return model
+
+
+def get_number_success(df):
+    index = 0
+    success = 0
+    while index < df.shape[0]:
+        if index % 9 <= 0:
+            index += 3
+            continue
+        if df.iloc[index]['f1_score'] > df.iloc[index + 3]['f1_score']:
+            success += 1
+        index += 1
+        if index % 9 == 6:
+            index += 6
+
+    return success
