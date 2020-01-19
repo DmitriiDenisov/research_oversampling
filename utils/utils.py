@@ -5,8 +5,16 @@ import pandas as pd
 import numpy as np
 
 from imblearn.datasets import fetch_datasets
+
+import os
+os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3'
+import warnings
+warnings.simplefilter(action='ignore', category=FutureWarning)
+warnings.filterwarnings(action="ignore", category=DeprecationWarning)
+
 from keras import Sequential
 from keras.layers import Dense
+
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.metrics import f1_score, precision_score, recall_score, average_precision_score
 from sklearn.neighbors import NearestNeighbors

@@ -1,3 +1,9 @@
+import warnings
+
+warnings.simplefilter(action='ignore', category=FutureWarning)
+warnings.filterwarnings(action="ignore", category=DeprecationWarning)
+# warnings.filterwarnings("ignore")
+
 from itertools import product
 from os import path
 from tqdm import tqdm
@@ -17,17 +23,18 @@ from utils.utils import get_dataset_pd, add_metainfo_dataset, get_NN, add_metada
 #             'mammography',
 #    ]
 
-datasets = ['abalone', 'sick_euthyroid']
+# datasets = ['abalone', 'sick_euthyroid']
 
-list_k_theta = [[1 / 8, 2.], [1.5, 6.5]]
-for (k, theta) in list_k_theta:
+list_k_theta = [[0.125, 2.], [1.5, 6.5], [1.7, 7], [1.7, 2], [1, 2], [1, 4]]
+for (k, theta) in tqdm(list_k_theta):
+    print(k, theta)
     if path.exists('output.xlsx'):
         df_result = pd.read_excel('output.xlsx', index_col=None)
     else:
         df_result = pd.DataFrame(
             columns=COLUMNS)
 
-    for dataset in tqdm(datasets):
+    for dataset in DATASETS:
         # continue # !!!!!
         print(dataset)
         X_temp, y = get_dataset_pd(dataset)
@@ -43,7 +50,7 @@ for (k, theta) in list_k_theta:
         num_ones = X_temp[X_temp['y'] == 1].to_numpy().shape[0]
 
         for mode, clf in product(MODES, classifiers):
-            print(mode)
+            # print(mode)
             dict_metrics, num_folds = handle_dataset(X_temp.drop('y', 1), y, dict(), aug_data=mode,
                                                      num_folds=INITIAL_FOLDS,
                                                      n_neighbours=N_NEIGH, clf=clf, k=k, theta=theta)
@@ -61,4 +68,5 @@ for (k, theta) in list_k_theta:
     # print(df_result)
     success = get_number_success(df_result)
     df_result = add_metadata(df_result, k, theta, success)
+    print('Saving output_{}_{}_{}.xlsx'.format(k, theta, success))
     df_result.to_excel("output_{}_{}_{}.xlsx".format(k, theta, success), index=False)
