@@ -46,7 +46,7 @@ https://imbalanced-learn.readthedocs.io/en/stable/generated/imblearn.over_sampli
 
 - [x] Add to statistics dataframe number of elements and percantage of minority class
 
-- [ ] Debug code to check everything
+- [x] Debug code to check everything
 
 
 
