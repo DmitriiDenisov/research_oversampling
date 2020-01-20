@@ -49,6 +49,7 @@ https://imbalanced-learn.readthedocs.io/en/stable/generated/imblearn.over_sampli
 - [x] Debug code to check everything
 
 - [ ] Find random state and parameters for achieving 33-34 number of successes 
+seed=0, [[1, 2], [1, 2.5]], successes=[30, 28] 
 
 - [ ] Add random oversampling and random undesampling
 
