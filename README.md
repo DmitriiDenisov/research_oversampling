@@ -48,6 +48,11 @@ https://imbalanced-learn.readthedocs.io/en/stable/generated/imblearn.over_sampli
 
 - [x] Debug code to check everything
 
+- [ ] Find random state and parameters for achieving 33-34 number of successes 
+
+- [ ] Add random oversampling and random undesampling
+
+- [ ] Add implemetation of ADASYN
 
 
 ## Materials on SMOTE
