@@ -52,6 +52,8 @@ https://imbalanced-learn.readthedocs.io/en/stable/generated/imblearn.over_sampli
 seed=0, [[1, 2], [1, 2.5]], successes=[30, 28] 
 seed=1, [[1, 2], [1, 2.5]], successes=[33, 24]
 
+- [ ] Add implementation of synthetic dataset with parameters and random seed found in previous 
+
 - [ ] Add random oversampling and random undesampling
 
 - [ ] Add implemetation of ADASYN
