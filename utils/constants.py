@@ -7,7 +7,8 @@ COLUMNS = ['NAME_Dataset', 'Algo', 'N_neigh', 'NUM_elements',
            'minority_perc', 'Generated_points', 'NUM_fails', 'f1_score',
            'precision', 'recall', 'AUC_PR']
 
-DATASETS = ['ecoli',
+DATASETS = [# 'synthetic', # пока что нет, потом добавим
+            'ecoli',
             'optical_digits',
             'satimage',
             'pen_digits',

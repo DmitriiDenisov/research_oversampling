@@ -59,7 +59,7 @@ def handle_dataset(X: np.array,
             # 4. Fit
             # clf = RandomForestClassifier(n_estimators=50)
             if isinstance(clf, Sequential):
-                clf.fit(X_train, y_train.to_numpy().flatten(), epochs=10, verbose=0)
+                clf.fit(X_train, y_train.to_numpy().flatten(), epochs=1, verbose=0, shuffle=False)
             else:
                 clf.fit(X_train, y_train.to_numpy().flatten())
 
@@ -129,7 +129,7 @@ def handle_dataset(X: np.array,
             if y_train['y'].sum() < 2 or y_test['y'].sum() < 2:
                 num_folds -= 1
                 continue
-            X_test = X_test.drop('y', 1, errors='ignore')
+            X_test = X_test.drop('y', 1, errors='ignore')  # ????
 
             # 3. Augment train part by generating new minority points
             smt = SMOTE(sampling_strategy='auto', k_neighbors=5)  # random_state=42

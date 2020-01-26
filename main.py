@@ -1,3 +1,54 @@
+# for i in {1..10}; do /usr/bin/python3.7 main.py --seed $i; done
+# for i in {1..10}; do /usr/local/bin/python3.7 main.py --seed $i; done
+
+import argparse
+
+parser = argparse.ArgumentParser(description='Process some integers.')
+parser.add_argument('--seed', dest='seed', type=int, default=1,
+                    help='random seed')
+args = parser.parse_args()
+
+# Seed value
+# Apparently you may use different seed values at each stage
+seed_value = args.seed
+
+# 1. Set `PYTHONHASHSEED` environment variable at a fixed value
+import os
+
+os.environ['PYTHONHASHSEED'] = '0'
+os.environ['CUDA_VISIBLE_DEVICES'] = '-1'
+os.environ['TF_CUDNN_USE_AUTOTUNE'] = str(seed_value)
+
+# 2. Set `python` built-in pseudo-random generator at a fixed value
+import random
+
+random.seed(seed_value)
+
+# 3. Set `numpy` pseudo-random generator at a fixed value
+import numpy as np
+
+np.random.seed(seed_value)
+
+# 4. Set `tensorflow` pseudo-random generator at a fixed value
+import tensorflow as tf
+from tensorflow import set_random_seed
+
+set_random_seed(seed_value)
+# tf.set_random_seed(seed_value)
+
+# 5. Configure a new global `tensorflow` session
+from keras import backend as K
+
+session_conf = tf.ConfigProto(intra_op_parallelism_threads=1, inter_op_parallelism_threads=1, allow_soft_placement=True,
+                              device_count={'CPU': 1})
+sess = tf.Session(graph=tf.get_default_graph(), config=session_conf)
+K.set_session(sess)
+
+# удивительно, но это надо для того, чтобы зафиксировать рандом в Керасе
+# Пруф: https://github.com/keras-team/keras/issues/2743
+from keras.models import Sequential
+
+import os
 import warnings
 
 warnings.simplefilter(action='ignore', category=FutureWarning)
@@ -18,15 +69,21 @@ from utils.constants import *
 
 from utils.utils import get_dataset_pd, add_metainfo_dataset, get_NN, add_metadata, get_number_success
 
-# datasets = [
-#             'ozone_level',
-#             'mammography',
-#    ]
+# DATASETS = [
+#    'spectrometer'
+# ]
+# MODES = ['initial', 'smote']
+# DATASETS = ['synthetic']
+# DATASETS = ['ecoli',
+#            'optical_digits',
+#            'satimage']
 
-# datasets = ['abalone', 'sick_euthyroid']
+# list_k_theta = [[0.125, 2.], [1.5, 6.5], [1.7, 7], [1.7, 2], [1, 2], [1, 4]]
+# list_k_theta = [[1, 2], [1, 2.5]]
+list_k_theta = [[1, 2]]
 
-list_k_theta = [[0.125, 2.], [1.5, 6.5], [1.7, 7], [1.7, 2], [1, 2], [1, 4]]
-for (k, theta) in tqdm(list_k_theta):
+print('Random_seed:', seed_value)
+for (k, theta) in list_k_theta:
     print(k, theta)
     if path.exists('output.xlsx'):
         df_result = pd.read_excel('output.xlsx', index_col=None)
@@ -37,9 +94,10 @@ for (k, theta) in tqdm(list_k_theta):
     for dataset in DATASETS:
         # continue # !!!!!
         print(dataset)
+
         X_temp, y = get_dataset_pd(dataset)
         classifiers = [get_NN(X_temp), RandomForestClassifier(n_estimators=50), SVC(gamma='auto')]
-        # classifiers = [SVC(gamma='auto')]
+        # classifiers = [get_NN(X_temp)]
         assert np.all(np.unique(y) == np.array([0, 1]))
         X_temp['y'] = y
         # Drop duplicates:
@@ -67,6 +125,13 @@ for (k, theta) in tqdm(list_k_theta):
 
     # print(df_result)
     success = get_number_success(df_result)
-    df_result = add_metadata(df_result, k, theta, success)
-    print('Saving output_{}_{}_{}.xlsx'.format(k, theta, success))
-    df_result.to_excel("output_{}_{}_{}.xlsx".format(k, theta, success), index=False)
+    df_result = add_metadata(df_result, k, theta, success, seed_value)
+    print('Saving output_{}_{}_success_{}_seed_{}.xlsx'.format(k, theta, success, seed_value))
+    # df_result.to_excel("compare_temp/output_{}_{}_success_{}_seed_{}.xlsx".format(k, theta, success, i),
+    #                   index=False)
+
+    i = 0
+    while os.path.isfile("compare_temp/{}.xlsx".format(i)):
+        i += 1
+    df_result.to_excel("compare_temp/{}.xlsx".format(i),
+                       index=False)

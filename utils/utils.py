@@ -7,8 +7,12 @@ import numpy as np
 from imblearn.datasets import fetch_datasets
 
 import os
+
+from utils.keras_utils import f1
+
 os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3'
 import warnings
+
 warnings.simplefilter(action='ignore', category=FutureWarning)
 warnings.filterwarnings(action="ignore", category=DeprecationWarning)
 
@@ -40,7 +44,7 @@ def add_metainfo_dataset(dict_metrics, dataset, num_ones, num_zeros, aug_data, n
     return dict_metrics
 
 
-def add_metadata(df_result, k, theta, success):
+def add_metadata(df_result, k, theta, success, seed):
     # s2 = pd.Series([Nan, Nan, Nan, Nan], index=['A', 'B', 'C', 'D'])
     # result = df1.append(s2)
     df_result = df_result.append(pd.Series(), ignore_index=True)
@@ -57,6 +61,11 @@ def add_metadata(df_result, k, theta, success):
     dict_temp = dict()
     dict_temp['NAME_Dataset'] = 'Number of success'
     dict_temp['Algo'] = success
+    df_result = df_result.append(dict_temp, ignore_index=True)
+
+    dict_temp = dict()
+    dict_temp['NAME_Dataset'] = 'Random Seed'
+    dict_temp['Algo'] = seed
     df_result = df_result.append(dict_temp, ignore_index=True)
 
     return df_result
@@ -208,6 +217,9 @@ def generate_gamma_negative(k=1 / 8, theta=2.):
 
 
 def get_dataset_pd(name):
+    if name == 'synthetic':
+        x, y = generate_synthetic_dataset()
+        return pd.DataFrame(x), y
     X = pd.DataFrame(fetch_datasets()[name]['data'])
     target = pd.DataFrame(fetch_datasets()[name]['target']).replace(-1, 0)
     assert target.shape[0] == X.shape[0]
@@ -252,9 +264,9 @@ def get_NN(X):
     model = Sequential()
     model.add(Dense(32, activation='relu', input_dim=X.shape[1]))
     model.add(Dense(1, activation='sigmoid'))
-    model.compile(optimizer='rmsprop',
+    model.compile(optimizer='adam',
                   loss='binary_crossentropy',
-                  metrics=['accuracy'])
+                  metrics=['accuracy', f1])
     # model.fit(X, y, epochs=100, verbose=0)
     return model
 
@@ -273,3 +285,29 @@ def get_number_success(df):
             index += 6
 
     return success
+
+
+def generate_synthetic_dataset():
+    # Create the minority points
+    n_minority = 250
+    x_min = np.linspace(0, 1000, n_minority)
+    y1_min = x_min + 2
+    y2_min = x_min - 2
+    X_min = np.hstack([x_min, x_min])
+    Y_min = np.hstack([y1_min, y2_min])
+    minority = np.concatenate([X_min[np.newaxis, :], Y_min[np.newaxis, :]], axis=0).T
+
+    # Create the majority points
+    n_majority = 2500
+    x_max = np.linspace(0, 1000, n_majority)
+    y1_max = x_max
+    y2_max = y1_max + (np.random.rand(n_majority) - 0.5) * 2
+    X_max = np.hstack([x_max, x_max])
+    Y_max = np.hstack([y1_max, y2_max])
+    majority = np.concatenate([X_max[np.newaxis, :], Y_max[np.newaxis, :]], axis=0).T
+
+    x = np.concatenate([minority, majority], axis=0)
+    y = np.array([1] * 2 * n_minority + [0] * 2 * n_majority)
+    assert x.shape[0] == len(y)
+
+    return x, y
