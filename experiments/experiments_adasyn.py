@@ -1,8 +1,5 @@
 from imblearn.datasets import fetch_datasets
-from imblearn.over_sampling import SMOTE
-import pandas as pd
-import numpy as np
-from sklearn.model_selection import train_test_split
+from imblearn.over_sampling import ADASYN
 
 s = 'ecoli'
 fetched = fetch_datasets()[s]
@@ -16,17 +13,17 @@ num_ones = y[y == 1].shape[0]
 # 'not majority': resample all classes but the majority class;
 #
 # Explanation: https://imbalanced-learn.readthedocs.io/en/stable/over_sampling.html#smote-adasyn
-smt_1 = SMOTE(sampling_strategy='auto', k_neighbors=5)  # random_state=42
+overs = ADASYN(random_state=42)
 
 print('X initail shape:', X.shape)
 print('y initial shape:', y.shape)
 print('y_mijority initial:', num_zeros)
 print('y_minority initial:', num_ones)
 # X_train, y_train = smt_1.fit_sample(X, y) # fit_sample is alias to fit_resample
-X_train, y_train = smt_1.fit_resample(X, y)
+X_train, y_train = overs.fit_resample(X, y)
 num_zeros = y_train[y_train == 0].shape[0]
 num_ones = y_train[y_train == 1].shape[0]
-print('X SMOTE shape:', X_train.shape)
-print('y SMOTE shape:', y_train.shape)
-print('y SMOTE_minority new:', num_zeros)
-print('y SMOTE_majority new:', num_ones)
+print('X ADASYN shape:', X_train.shape)
+print('y ADASYN shape:', y_train.shape)
+print('y ADASYN_minority new:', num_zeros)
+print('y ADASYN_majority new:', num_ones)

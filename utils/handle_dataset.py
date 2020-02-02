@@ -1,4 +1,5 @@
-from imblearn.over_sampling import SMOTE
+from imblearn.over_sampling import SMOTE, RandomOverSampler, ADASYN
+from imblearn.under_sampling import RandomUnderSampler
 from keras.engine.sequential import Sequential
 from sklearn.neighbors import NearestNeighbors
 import numpy as np
@@ -118,7 +119,7 @@ def handle_dataset(X: np.array,
             dict_metrics = {k: v / num_folds for k, v in dict_metrics.items()}
         dict_metrics['NUM_fails'] = initial_folds_num - num_folds
 
-    elif aug_data == 'smote':
+    elif aug_data == 'smote' or aug_data == 'UNDERSAMP' or aug_data == 'OVERSAMP' or aug_data == 'ADASYN':
         kf = KFold(n_splits=num_folds, shuffle=True)
         kf.get_n_splits(X)
 
@@ -132,9 +133,17 @@ def handle_dataset(X: np.array,
             X_test = X_test.drop('y', 1, errors='ignore')  # ????
 
             # 3. Augment train part by generating new minority points
-            smt = SMOTE(sampling_strategy='auto', k_neighbors=5)  # random_state=42
-            X_train_aug, y_train_aug = smt.fit_resample(X_train.to_numpy(), y_train.to_numpy().flatten())
-            assert (y_train_aug == 0).sum() == (y_train_aug == 1).sum() == (y_train['y'] == 0).sum()
+            if aug_data == 'smote':
+                algo = SMOTE(sampling_strategy='auto', k_neighbors=5)  # random_state=42
+            elif aug_data == 'UNDERSAMP':
+                algo = RandomUnderSampler(random_state=42)
+            elif aug_data == 'OVERSAMP':
+                algo = RandomOverSampler(random_state=42)
+            elif aug_data == 'ADASYN':
+                algo = ADASYN(random_state=42)
+
+            X_train_aug, y_train_aug = algo.fit_resample(X_train.to_numpy(), y_train.to_numpy().flatten())
+            # assert (y_train_aug == 0).sum() == (y_train_aug == 1).sum() == (y_train['y'] == 0).sum()
 
             # 4. Shuffle
             assert len(X_train_aug) == len(y_train_aug)

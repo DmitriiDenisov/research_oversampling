@@ -271,18 +271,14 @@ def get_NN(X):
     return model
 
 
-def get_number_success(df):
-    index = 0
+def get_number_success(df, index=3, step=3):
     success = 0
     while index < df.shape[0]:
-        if index % 9 <= 0:
-            index += 3
-            continue
-        if df.iloc[index]['f1_score'] > df.iloc[index + 3]['f1_score']:
+        if df.iloc[index]['f1_score'] > df.iloc[index + step]['f1_score']:
             success += 1
         index += 1
-        if index % 9 == 6:
-            index += 6
+        if index % 19 == 6:
+            index += 16
 
     return success
 
