@@ -54,9 +54,9 @@ seed=1, [[1, 2], [1, 2.5]], successes=[33, 24]
 
 - [x] Add implementation of synthetic dataset with parameters and random seed found in previous 
 
-- [ ] Add random oversampling and random undesampling
+- [x] Add random oversampling and random undesampling
 
-- [ ] Add implemetation of ADASYN
+- [x] Add implemetation of ADASYN
 
 
 ## Materials on SMOTE
