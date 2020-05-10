@@ -3,7 +3,7 @@ N_NEIGH = 3
 # K = 1 / 8
 # THETA = 2.
 MODES = ['initial', 'gamma', 'smote', 'ADASYN', 'OVERSAMP', 'UNDERSAMP']
-MODES = ['ADASYN', 'OVERSAMP', 'UNDERSAMP']
+# MODES = ['ADASYN', 'OVERSAMP', 'UNDERSAMP']
 COLUMNS = ['NAME_Dataset', 'Algo', 'N_neigh', 'NUM_elements',
            'minority_perc', 'Generated_points', 'NUM_fails', 'f1_score',
            'precision', 'recall', 'AUC_PR']

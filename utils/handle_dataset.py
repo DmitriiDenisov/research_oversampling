@@ -1,3 +1,5 @@
+from time import time
+
 from imblearn.over_sampling import SMOTE, RandomOverSampler, ADASYN
 from imblearn.under_sampling import RandomUnderSampler
 from keras.engine.sequential import Sequential
@@ -40,6 +42,7 @@ def handle_dataset(X: np.array,
         kf.get_n_splits(X)
 
         for train_index, test_index in kf.split(X):
+            start_time = time()
             # 2. Split on test and train
             X_train, X_test = X.iloc[train_index], X.iloc[test_index]
             y_train, y_test = y.iloc[train_index], y.iloc[test_index]
@@ -69,6 +72,7 @@ def handle_dataset(X: np.array,
             y_pred = np.around(y_pred)  # для нейронки
 
             dict_temp = get_metrics(y_test, y_pred, aug_data)
+            dict_temp['time_sec'] = time() - start_time
             dict_metrics = {k: dict_metrics.get(k, 0) + dict_temp.get(k, 0) for k in set(dict_metrics) | set(dict_temp)}
         if num_folds:  # in case every k-fold does not have at least two minority points
             # metrics = metrics / num_folds
@@ -84,6 +88,7 @@ def handle_dataset(X: np.array,
         kf.get_n_splits(X)
 
         for train_index, test_index in kf.split(X):
+            start_time = time()
             # 2. Split on test and train
             X_train, X_test = X.iloc[train_index], X.iloc[test_index]
             y_train, y_test = y.iloc[train_index], y.iloc[test_index]
@@ -114,6 +119,7 @@ def handle_dataset(X: np.array,
             y_pred = np.around(y_pred)  # для нейронки
 
             dict_temp = get_metrics(y_test, y_pred, aug_data)
+            dict_temp['time_sec'] = time() - start_time
             dict_metrics = {k: dict_metrics.get(k, 0) + dict_temp.get(k, 0) for k in set(dict_metrics) | set(dict_temp)}
         if num_folds:  # in case every k-fold does not have at least two minority points
             dict_metrics = {k: v / num_folds for k, v in dict_metrics.items()}
@@ -124,6 +130,7 @@ def handle_dataset(X: np.array,
         kf.get_n_splits(X)
 
         for train_index, test_index in kf.split(X):
+            start_time = time()
             # 2. Split on test and train
             X_train, X_test = X.iloc[train_index], X.iloc[test_index]
             y_train, y_test = y.iloc[train_index], y.iloc[test_index]
@@ -163,6 +170,7 @@ def handle_dataset(X: np.array,
             y_pred = np.around(y_pred)  # для нейронки
 
             dict_temp = get_metrics(y_test, y_pred, aug_data)
+            dict_temp['time_sec'] = time() - start_time
             dict_metrics = {k: dict_metrics.get(k, 0) + dict_temp.get(k, 0) for k in set(dict_metrics) | set(dict_temp)}
         if num_folds:  # in case every k-fold does not have at least two minority points
             dict_metrics = {k: v / num_folds for k, v in dict_metrics.items()}

@@ -1,6 +1,6 @@
-# for i in {1..10}; do /usr/bin/python3.7 main.py --seed $i; done
-# for i in {1..10}; do /usr/local/bin/python3.7 main.py --seed $i; done
-
+# for i in {1..10}; do python3 main.py --seed $i; done
+# for i in {1..10}; do python3 main.py --seed $i; done
+import datetime
 import argparse
 
 parser = argparse.ArgumentParser(description='Process some integers.')
@@ -31,18 +31,20 @@ np.random.seed(seed_value)
 
 # 4. Set `tensorflow` pseudo-random generator at a fixed value
 import tensorflow as tf
-from tensorflow import set_random_seed
+# from tensorflow import set_random_seed
 
-set_random_seed(seed_value)
-# tf.set_random_seed(seed_value)
+# set_random_seed(seed_value)
+import tensorflow
+
+tensorflow.random.set_seed(seed_value)
 
 # 5. Configure a new global `tensorflow` session
 from keras import backend as K
 
-session_conf = tf.ConfigProto(intra_op_parallelism_threads=1, inter_op_parallelism_threads=1, allow_soft_placement=True,
-                              device_count={'CPU': 1})
-sess = tf.Session(graph=tf.get_default_graph(), config=session_conf)
-K.set_session(sess)
+# session_conf = tf.ConfigProto(intra_op_parallelism_threads=1, inter_op_parallelism_threads=1, allow_soft_placement=True,
+#                              device_count={'CPU': 1})
+# sess = tf.Session(graph=tf.get_default_graph(), config=session_conf)
+# K.set_session(sess)
 
 # удивительно, но это надо для того, чтобы зафиксировать рандом в Керасе
 # Пруф: https://github.com/keras-team/keras/issues/2743
@@ -62,6 +64,7 @@ import pandas as pd
 import numpy as np
 
 from sklearn.ensemble import RandomForestClassifier
+from sklearn.tree import DecisionTreeClassifier
 from sklearn.svm import SVC
 
 from utils.handle_dataset import handle_dataset
@@ -69,11 +72,13 @@ from utils.constants import *
 
 from utils.utils import get_dataset_pd, add_metainfo_dataset, get_NN, add_metadata, get_number_success
 
+print(f'Started: {datetime.datetime.now()}')
+
 # DATASETS = [
 #    'spectrometer'
 # ]
 # MODES = ['initial', 'smote']
-# DATASETS = ['synthetic']
+DATASETS = ['synthetic']
 # DATASETS = ['ecoli',
 #            'optical_digits',
 #            'satimage']
@@ -91,13 +96,13 @@ for (k, theta) in list_k_theta:
         df_result = pd.DataFrame(
             columns=COLUMNS)
 
-    for dataset in DATASETS:
+    for dataset in DATASETS:  # !!!!!!!!!!!!!!!!
         # continue # !!!!!
         print(dataset)
 
         X_temp, y = get_dataset_pd(dataset)
-        classifiers = [get_NN(X_temp), RandomForestClassifier(n_estimators=50), SVC(gamma='auto')]
-        # classifiers = [get_NN(X_temp)]
+        # classifiers = [get_NN(X_temp), RandomForestClassifier(n_estimators=50), DecisionTreeClassifier(), SVC(gamma='auto')]
+        classifiers = [DecisionTreeClassifier()]
         assert np.all(np.unique(y) == np.array([0, 1]))
         X_temp['y'] = y
         # Drop duplicates:
@@ -108,7 +113,7 @@ for (k, theta) in list_k_theta:
         num_ones = X_temp[X_temp['y'] == 1].to_numpy().shape[0]
 
         for mode, clf in product(MODES, classifiers):
-            # print(mode)
+            print(mode)
             dict_metrics, num_folds = handle_dataset(X_temp.drop('y', 1), y, dict(), aug_data=mode,
                                                      num_folds=INITIAL_FOLDS,
                                                      n_neighbours=N_NEIGH, clf=clf, k=k, theta=theta)
@@ -126,12 +131,15 @@ for (k, theta) in list_k_theta:
     # print(df_result)
     success = get_number_success(df_result)
     df_result = add_metadata(df_result, k, theta, success, seed_value)
-    print('Saving output_{}_{}_success_{}_seed_{}.xlsx'.format(k, theta, success, seed_value))
-    # df_result.to_excel("compare_temp/output_{}_{}_success_{}_seed_{}.xlsx".format(k, theta, success, i),
-    #                   index=False)
+    print(f'Saving output_{k}_{theta}_success_{success}_seed_{seed_value}.xlsx')
+    df_result.to_excel(f"compare_temp/output_{k}_{theta}_success_{success}_seed_{seed_value}.xlsx",
+                       index=False)
 
     i = 0
-    while os.path.isfile("compare_temp/{}.xlsx".format(i)):
+    os.makedirs("compare_temp", exist_ok=True)
+    while os.path.isfile(f"compare_temp/{i}.xlsx"):
         i += 1
-    df_result.to_excel("compare_temp/{}.xlsx".format(i),
+    df_result.to_excel(f"compare_temp/{i}.xlsx",
                        index=False)
+
+print(f'Finished: {datetime.datetime.now()}')
