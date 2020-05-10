@@ -101,8 +101,9 @@ for (k, theta) in list_k_theta:
         print(dataset)
 
         X_temp, y = get_dataset_pd(dataset)
-        # classifiers = [get_NN(X_temp), RandomForestClassifier(n_estimators=50), DecisionTreeClassifier(), SVC(gamma='auto')]
-        classifiers = [DecisionTreeClassifier()]
+        classifiers = [get_NN(X_temp), RandomForestClassifier(n_estimators=50), DecisionTreeClassifier(),
+                       SVC(gamma='auto')]
+        # classifiers = [DecisionTreeClassifier()]
         assert np.all(np.unique(y) == np.array([0, 1]))
         X_temp['y'] = y
         # Drop duplicates:
@@ -133,7 +134,7 @@ for (k, theta) in list_k_theta:
     df_result = add_metadata(df_result, k, theta, success, seed_value)
     print(f'Saving output_{k}_{theta}_success_{success}_seed_{seed_value}.xlsx')
     df_result.to_excel(f"compare_temp/output_{k}_{theta}_success_{success}_seed_{seed_value}.xlsx",
-                       index=False)
+                        index=False)
 
     i = 0
     os.makedirs("compare_temp", exist_ok=True)
