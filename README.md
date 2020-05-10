@@ -2,11 +2,26 @@
 
 ## How to run:
 
-Estimation of executing time: 
+Run:
+`python3 main.py`
+
+This will produce a file `compare_temp/output_{k}_{theta}_success_{success}_seed_{seed_value}.xlsx`
+
+Estimation of executing time: ~5 hours
 
 ## Structure of Repo:
 
-
+`main.py` - script which runs all experiments and produces results into excel file
+ 
+`test.py` - script for tests implemented with `pytest` library.
+ 
+ To run: `pytest tests.py -vv` 
+ 
+ `utils` folder contains secondary functions which are used in `main.py`
+ 
+ `tests` folder contains functions only for tests which are used in `test.py`
+ 
+ `experiments` contains several jupyter notebooks only for visualization and experiential purposes
 
 ## Materials on SMOTE
 
@@ -15,8 +30,10 @@ https://basegroup.ru/community/articles/imbalance-datasets
 https://youtu.be/FheTDyCwRdE
 
 ## Authors:
-Firuz Kamalov
-Dmitry Denisov
+
+Firuz Kamalov (firuz@cud.ac.ae)
+
+Dmitry Denisov (dmitryhse@gmail.com)
 
 ## Possible issues:
 
