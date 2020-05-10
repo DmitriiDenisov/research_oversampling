@@ -23,17 +23,11 @@ Estimation of executing time: ~5 hours
  
  `experiments` contains several jupyter notebooks only for visualization and experiential purposes
 
-## Materials on SMOTE
-
-https://basegroup.ru/community/articles/imbalance-datasets
-
-https://youtu.be/FheTDyCwRdE
-
 ## Authors:
 
-Firuz Kamalov (firuz@cud.ac.ae)
+Firuz Kamalov firuz@cud.ac.ae
 
-Dmitry Denisov (dmitryhse@gmail.com)
+Dmitry Denisov dmitryhse@gmail.com
 
 ## Possible issues:
 
@@ -52,3 +46,11 @@ Problem:
 
 Solution:
 https://stackoverflow.com/questions/50236117/scraping-ssl-certificate-verify-failed-error-for-http-en-wikipedia-org
+
+## Additional on SMOTE and ADDASYN
+
+https://imbalanced-learn.readthedocs.io/en/stable/auto_examples/over-sampling/plot_comparison_over_sampling.html#sphx-glr-auto-examples-over-sampling-plot-comparison-over-sampling-py
+
+https://youtu.be/FheTDyCwRdE
+
+https://basegroup.ru/community/articles/imbalance-datasets
