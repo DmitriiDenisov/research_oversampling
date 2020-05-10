@@ -2,6 +2,10 @@
 
 ## How to run:
 
+Estimation of executing time: 
+
+## Structure of Repo:
+
 
 
 ## Materials on SMOTE
