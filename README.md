@@ -7,6 +7,8 @@ Run:
 
 This will produce a file `compare_temp/output_{k}_{theta}_success_{success}_seed_{seed_value}.xlsx`
 
+Execution time on server ~ 1 hour
+
 ## Dependencies:
 
 `pip install -r requirements.txt`
