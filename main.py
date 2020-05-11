@@ -78,7 +78,7 @@ print(f'Started: {datetime.datetime.now()}')
 #    'spectrometer'
 # ]
 # MODES = ['initial', 'smote']
-DATASETS = ['synthetic']
+DATASETS = ['pen_digits']
 # DATASETS = ['ecoli',
 #            'optical_digits',
 #            'satimage']
@@ -115,6 +115,7 @@ for (k, theta) in list_k_theta:
 
         for mode, clf in product(MODES, classifiers):
             print(mode)
+            INITIAL_FOLDS = 5  # !!!!!!!!!!!!!!!!!!!
             dict_metrics, num_folds = handle_dataset(X_temp.drop('y', 1), y, dict(), aug_data=mode,
                                                      num_folds=INITIAL_FOLDS,
                                                      n_neighbours=N_NEIGH, clf=clf, k=k, theta=theta)
@@ -132,15 +133,18 @@ for (k, theta) in list_k_theta:
     # print(df_result)
     success = get_number_success(df_result)
     df_result = add_metadata(df_result, k, theta, success, seed_value)
+    os.makedirs("compare_temp", exist_ok=True)
     print(f'Saving output_{k}_{theta}_success_{success}_seed_{seed_value}.xlsx')
     df_result.to_excel(f"compare_temp/output_{k}_{theta}_success_{success}_seed_{seed_value}.xlsx",
-                        index=False)
+                       index=False)
 
     i = 0
-    os.makedirs("compare_temp", exist_ok=True)
+
+    """
     while os.path.isfile(f"compare_temp/{i}.xlsx"):
         i += 1
     df_result.to_excel(f"compare_temp/{i}.xlsx",
                        index=False)
+    """
 
 print(f'Finished: {datetime.datetime.now()}')
