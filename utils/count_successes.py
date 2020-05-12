@@ -4,7 +4,8 @@ from utils.constants import DATASETS
 from utils.utils import get_number_success
 
 df_result = pd.read_excel('consolidated_results.xlsx', index_col=None)
+df_result = df_result.dropna(how='all')
 
-for i, step in [['smote', 3], ['ADASYN', 6], ['OVERSAMP', 9], ['UNDERSAMP', 12]]:
-    success = get_number_success(df_result, index=3, step=step)
-    print('Gamma VS {}. Success: {} out of {}'.format(i, success, len(DATASETS) * 3))
+for mode, i in [['smote', 4], ['ADASYN', 8], ['OVERSAMP', 12], ['UNDERSAMP', 16]]:
+    success = get_number_success(df_result, index=i, num_modes=7)
+    print(f'Gamma VS {mode}. Success: {success} out of {len(DATASETS) * 4}')

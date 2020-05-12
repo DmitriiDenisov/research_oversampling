@@ -156,7 +156,8 @@ def generate_random_point_nd(num_points=2, n=10, min_=0, max_=10):
     return data
 
 
-def generate_points_for_n_minority(minority_points, num_to_add, n_neighbors, k, theta, tol=0.0000001, testing=False):
+def generate_points_for_n_minority(minority_points, num_to_add, n_neighbors, k, theta, aug_data='gamma', tol=0.0000001,
+                                   testing=False):
     n_features = minority_points.shape[1]
     dict_ans = defaultdict(lambda: np.array([]).reshape(0, n_features))
 
@@ -202,11 +203,20 @@ def generate_points_for_n_minority(minority_points, num_to_add, n_neighbors, k, 
     # assert random_choice_minority.shape[0] == num_to_add and random_choice_minority.shape[1] == 2
     for i, (idx1, idx2) in enumerate(all_pairs):
         v = get_vector_two_points([minority_points[idx1], minority_points[idx2]])
+        if aug_data == 'gamma':
+            # gamma_coeff = generate_gamma()
+            gamma_coeff = generate_gamma_negative(k=k, theta=theta)
+            generated_point = generate_point_on_line(minority_points[idx1], v, gamma_coeff)
+        elif aug_data == 'smote+normal':
+            uniform_coeff = np.random.uniform(0, 1, 1)[0]
+            generated_point = generate_point_on_line(minority_points[idx1], v, uniform_coeff)
+            generated_point = \
+                np.random.multivariate_normal(mean=generated_point, cov=np.eye(generated_point.shape[0], dtype=int),
+                                              size=1)[0]
+        else:
+            generated_point = None
+            raise AssertionError("Unexpected value")
 
-        # gamma_coeff = generate_gamma()
-        gamma_coeff = generate_gamma_negative(k=k, theta=theta)
-
-        generated_point = generate_point_on_line(minority_points[idx1], v, gamma_coeff)
         minority_points = np.concatenate((minority_points, generated_point[np.newaxis, :]), axis=0)
         dict_ans[tuple(all_pairs[i])] = np.vstack([dict_ans[tuple(all_pairs[i])], generated_point])
 
@@ -236,7 +246,7 @@ def get_dataset_pd(name):
     return X, target
 
 
-def aug_train(X_temp, n_neighbors, k, theta, testing=False):
+def aug_train(X_temp, n_neighbors, k, theta, aug_data, testing=False):
     # Подавать внутрь датафрейм X_temp с колонкой y
     num_zeros = X_temp[X_temp['y'] == 0].to_numpy().shape[0]
     num_ones = X_temp[X_temp['y'] == 1].to_numpy().shape[0]
@@ -244,7 +254,8 @@ def aug_train(X_temp, n_neighbors, k, theta, testing=False):
     num_add = num_zeros - num_ones
     minority_points = X_temp[X_temp['y'] == 1].drop('y', 1).to_numpy()
 
-    minority_points, dict_ans = generate_points_for_n_minority(minority_points, num_add, n_neighbors, k, theta)
+    minority_points, dict_ans = generate_points_for_n_minority(minority_points, num_add, n_neighbors, k, theta,
+                                                               aug_data=aug_data)
     assert minority_points.shape[0] == X_temp[X_temp['y'] == 1].to_numpy().shape[0] + num_add
     assert num_zeros == minority_points.shape[0]
 
@@ -282,16 +293,17 @@ def get_NN(X):
     return model
 
 
-def get_number_success(df, index=4, step=4):
+def get_number_success(df, index=4, num_modes=7):
     success = 0
+    step = index
     try:
         index_start = index
         while index < df.shape[0]:
             if df.iloc[index]['f1_score'] > df.iloc[index + step]['f1_score']:
                 success += 1
             index += 1
-            if index == index_start + 4:
-                index += 20
+            if index == index_start + step:
+                index += num_modes * step - step
                 index_start = index
     except IndexError:
         success = np.nan

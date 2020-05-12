@@ -80,7 +80,7 @@ def handle_dataset(X: np.array,
         # dict(list(dict_metrics.items()) + list(dict('pr').items()))
         dict_metrics['NUM_fails'] = initial_folds_num - num_folds
 
-    elif aug_data == 'gamma':
+    elif aug_data == 'gamma' or aug_data == 'smote+normal':
         # 1. Get dataset:
         # X, y = get_dataset_pd(name_dataset)
         X['y'] = y
@@ -98,7 +98,7 @@ def handle_dataset(X: np.array,
             X_test = X_test.drop('y', 1)
 
             # 3. Augment train part by generating new minority points
-            X_train_aug = aug_train(X_train, n_neighbours, k, theta)
+            X_train_aug = aug_train(X_train, n_neighbours, k, theta, aug_data)
 
             # 4. Shuffle
             X_train_aug = X_train_aug.sample(frac=1)  # shuffle

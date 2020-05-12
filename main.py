@@ -78,7 +78,9 @@ print(f'Started: {datetime.datetime.now()}')
 #    'spectrometer'
 # ]
 # MODES = ['initial', 'smote']
-DATASETS = ['pen_digits']
+# DATASETS = ['pen_digits']
+# MODES = ['smote+normal']
+# DATASETS = ['synthetic']
 # DATASETS = ['ecoli',
 #            'optical_digits',
 #            'satimage']
@@ -86,6 +88,10 @@ DATASETS = ['pen_digits']
 # list_k_theta = [[0.125, 2.], [1.5, 6.5], [1.7, 7], [1.7, 2], [1, 2], [1, 4]]
 # list_k_theta = [[1, 2], [1, 2.5]]
 list_k_theta = [[1, 2]]
+
+# INITIAL_FOLDS = 10
+# print(INITIAL_FOLDS)
+
 
 print('Random_seed:', seed_value)
 for (k, theta) in list_k_theta:
@@ -114,8 +120,7 @@ for (k, theta) in list_k_theta:
         num_ones = X_temp[X_temp['y'] == 1].to_numpy().shape[0]
 
         for mode, clf in product(MODES, classifiers):
-            print(mode)
-            INITIAL_FOLDS = 5  # !!!!!!!!!!!!!!!!!!!
+            # print(mode)
             dict_metrics, num_folds = handle_dataset(X_temp.drop('y', 1), y, dict(), aug_data=mode,
                                                      num_folds=INITIAL_FOLDS,
                                                      n_neighbours=N_NEIGH, clf=clf, k=k, theta=theta)
@@ -131,20 +136,17 @@ for (k, theta) in list_k_theta:
         #       (dict_metrics['NUM_fails'] == dict_metrics['NUM_fails_gamma'])
 
     # print(df_result)
-    success = get_number_success(df_result)
+    success = get_number_success(df_result, index=len(classifiers), num_modes=len(MODES))
     df_result = add_metadata(df_result, k, theta, success, seed_value)
-    os.makedirs("compare_temp", exist_ok=True)
     print(f'Saving output_{k}_{theta}_success_{success}_seed_{seed_value}.xlsx')
-    df_result.to_excel(f"compare_temp/output_{k}_{theta}_success_{success}_seed_{seed_value}.xlsx",
-                       index=False)
+    #df_result.to_excel(f"compare_temp/output_{k}_{theta}_success_{success}_seed_{seed_value}.xlsx",
+    #                    index=False)
 
     i = 0
-
-    """
+    os.makedirs("compare_temp", exist_ok=True)
     while os.path.isfile(f"compare_temp/{i}.xlsx"):
         i += 1
     df_result.to_excel(f"compare_temp/{i}.xlsx",
                        index=False)
-    """
 
 print(f'Finished: {datetime.datetime.now()}')
