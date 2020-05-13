@@ -293,17 +293,17 @@ def get_NN(X):
     return model
 
 
-def get_number_success(df, index=4, num_modes=7):
+def get_number_success(df, index=4, step=4, num_modes=7):
     success = 0
-    step = index
+    index_init = index
     try:
         index_start = index
         while index < df.shape[0]:
             if df.iloc[index]['f1_score'] > df.iloc[index + step]['f1_score']:
                 success += 1
             index += 1
-            if index == index_start + step:
-                index += num_modes * step - step
+            if index - index_start == index_init:
+                index += num_modes * index_init - index_init
                 index_start = index
     except IndexError:
         success = np.nan

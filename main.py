@@ -77,6 +77,7 @@ print(f'Started: {datetime.datetime.now()}')
 # DATASETS = [
 #    'spectrometer'
 # ]
+MODES = ['smote+normal']
 # MODES = ['initial', 'smote']
 # DATASETS = ['pen_digits']
 # MODES = ['smote+normal']
@@ -136,7 +137,7 @@ for (k, theta) in list_k_theta:
         #       (dict_metrics['NUM_fails'] == dict_metrics['NUM_fails_gamma'])
 
     # print(df_result)
-    success = get_number_success(df_result, index=len(classifiers), num_modes=len(MODES))
+    success = get_number_success(df_result, index=len(classifiers), step=4, num_modes=len(MODES))
     df_result = add_metadata(df_result, k, theta, success, seed_value)
     print(f'Saving output_{k}_{theta}_success_{success}_seed_{seed_value}.xlsx')
     #df_result.to_excel(f"compare_temp/output_{k}_{theta}_success_{success}_seed_{seed_value}.xlsx",
