@@ -108,7 +108,7 @@ for (k, theta) in list_k_theta:
         print(dataset)
 
         X_temp, y = get_dataset_pd(dataset)
-        classifiers = [get_NN(X_temp), RandomForestClassifier(n_estimators=50), DecisionTreeClassifier(),
+        classifiers = [get_NN(X_temp), DecisionTreeClassifier(), RandomForestClassifier(n_estimators=50),
                        SVC(gamma='auto')]
         # classifiers = [DecisionTreeClassifier()]
         assert np.all(np.unique(y) == np.array([0, 1]))
@@ -140,7 +140,7 @@ for (k, theta) in list_k_theta:
     success = get_number_success(df_result, index=len(classifiers), step=4, num_modes=len(MODES))
     df_result = add_metadata(df_result, k, theta, success, seed_value)
     print(f'Saving output_{k}_{theta}_success_{success}_seed_{seed_value}.xlsx')
-    #df_result.to_excel(f"compare_temp/output_{k}_{theta}_success_{success}_seed_{seed_value}.xlsx",
+    # df_result.to_excel(f"compare_temp/output_{k}_{theta}_success_{success}_seed_{seed_value}.xlsx",
     #                    index=False)
 
     i = 0
