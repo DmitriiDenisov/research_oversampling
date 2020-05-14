@@ -51,7 +51,7 @@ Problem:
 Solution:
 https://stackoverflow.com/questions/50236117/scraping-ssl-certificate-verify-failed-error-for-http-en-wikipedia-org
 
-## Additional on SMOTE and ADDASYN
+## Additional materials on SMOTE and ADDASYN
 
 https://imbalanced-learn.readthedocs.io/en/stable/auto_examples/over-sampling/plot_comparison_over_sampling.html#sphx-glr-auto-examples-over-sampling-plot-comparison-over-sampling-py
 
