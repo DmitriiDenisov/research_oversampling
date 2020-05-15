@@ -11,6 +11,8 @@ Execution time on server ~ 1 hour
 
 ## Dependencies:
 
+Python3.7.7 
+
 `pip install -r requirements.txt`
 
 ## Structure of Repo:
