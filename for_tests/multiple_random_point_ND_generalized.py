@@ -1,5 +1,6 @@
+from experiments.func_for_experiments import generate_random_point_nd
 from utils.tests_utils import test_points_on_line
-from utils.utils import generate_random_point_nd, generate_points_for_n_minority
+from utils.utils_py import generate_points_for_n_minority
 
 NUM_RAND_POINTS = 20
 NUM_MINORITY_POINTS = 5

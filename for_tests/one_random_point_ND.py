@@ -1,9 +1,10 @@
 import matplotlib.pyplot as plt
 
+from experiments.func_for_experiments import generate_random_point_nd
+
 plt.style.use('seaborn-whitegrid')
 from utils.tests_utils import test_points_on_line_old, test_points_on_line
-from utils.utils import get_vector_two_points, generate_gamma, generate_point_on_line, \
-    generate_random_point_nd
+from utils.utils_py import get_vector_two_points, generate_gamma, generate_point_on_line
 
 
 def main():

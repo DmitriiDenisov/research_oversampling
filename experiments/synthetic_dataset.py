@@ -4,7 +4,7 @@ import matplotlib.pyplot as plt
 # Create the minority points
 from matplotlib import pyplot
 
-from utils.utils import generate_synthetic_dataset
+from utils.utils_py import generate_synthetic_dataset
 
 n_minority = 250
 x_min = np.linspace(0, 1000, n_minority)

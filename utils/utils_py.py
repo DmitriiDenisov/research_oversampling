@@ -1,15 +1,10 @@
 import itertools
+import os
 from collections import defaultdict
-
 import pandas as pd
 import numpy as np
-
 from imblearn.datasets import fetch_datasets
-
-import os
-
 from sklearn.tree import DecisionTreeClassifier
-
 from utils.keras_utils import f1
 
 os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3'
@@ -20,7 +15,6 @@ warnings.filterwarnings(action="ignore", category=DeprecationWarning)
 
 from keras import Sequential
 from keras.layers import Dense
-
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.metrics import f1_score, precision_score, recall_score, average_precision_score
 from sklearn.neighbors import NearestNeighbors
@@ -30,12 +24,19 @@ from tqdm import tqdm
 from utils.tests_utils import test_points_on_line
 
 
-# from numpy.random import seed
-# seed(1)
-# import tensorflow
-# tensorflow.random.set_seed(1)
-
-def add_metainfo_dataset(dict_metrics, dataset, num_ones, num_zeros, aug_data, n_neigh, algo):
+def add_metainfo_dataset(dict_metrics: dict, dataset: str, num_ones: int, num_zeros: int, aug_data: str, n_neigh: int,
+                         algo: object) -> dict:
+    """
+    Adds meta info to each row of DataFrame with results such as: name of dataset, num elements and so on
+    :param dict_metrics: dict, row of DataFrame as dict
+    :param dataset: str, name of Dataset
+    :param num_ones: int, number of minority points in dataset
+    :param num_zeros: int, number of majority points in dataset
+    :param aug_data: str, mode of augmentation of data
+    :param n_neigh: int, number of neighbours for augmentation
+    :param algo: object, ML model
+    :return: dict, dictionary which is new row for the resulting DataFrame
+    """
     dict_metrics['NAME_Dataset'] = '{}_{}'.format(dataset, aug_data)
     dict_metrics['NUM_elements'] = num_ones + num_zeros
     dict_metrics['minority_perc'] = num_ones / (num_ones + num_zeros)
@@ -53,7 +54,33 @@ def add_metainfo_dataset(dict_metrics, dataset, num_ones, num_zeros, aug_data, n
     return dict_metrics
 
 
-def add_metadata(df_result, k, theta, success, seed):
+def get_clf(classname: str, num_f: int):
+    """
+    Function defines and returns algorithm
+    :param classname: str, name of algorithm
+    :param num_f: int, number of features in dataset
+    :return: object, Algorithm
+    """
+    if classname == 'DT':
+        return DecisionTreeClassifier()
+    elif classname == 'RF':
+        return RandomForestClassifier(n_estimators=50)
+    elif classname == 'SVC':
+        return SVC(gamma='auto')
+    elif classname == 'NN':
+        return get_NN(num_f)
+
+
+def add_metadata(df_result: pd.DataFrame, k: float, theta: float, success: int, seed: int) -> pd.DataFrame:
+    """
+    Adds meta info to resulting DataFrame namely K, Theta, Number of Successes and Random seed
+    :param df_result: pd.DataFrame, Resulting DataFrame with all metrics
+    :param k: float, k param for gamma oversampling
+    :param theta: float, theta param for gamma oversampling
+    :param success: int, number of successes when gamma oversampling outperformed another method
+    :param seed: int, random seed
+    :return: pd.DataFrame, Resulting DataFrame with added metadata
+    """
     # s2 = pd.Series([Nan, Nan, Nan, Nan], index=['A', 'B', 'C', 'D'])
     # result = df1.append(s2)
     df_result = df_result.append(pd.Series(), ignore_index=True)
@@ -80,23 +107,45 @@ def add_metadata(df_result, k, theta, success, seed):
     return df_result
 
 
-def distance(x1, x2):
-    return np.linalg.norm(x1 - x2)
-
-
-# Generates random point in rectangle [xy_min; xy_max]
-def generate_random_point(n=2, xy_min=[0, 0], xy_max=[10, 20]):
-    data = np.random.uniform(low=xy_min, high=xy_max, size=(n, 2))
-    return data
-
-
-# Returns directional vector
-def get_vector_two_points(two_points):
+def get_vector_two_points(two_points: np.array) -> np.array:
+    """
+    Returns vector of direction
+    :param two_points: np.array, two points
+    :return: np.array, vector of direction from point two_points[0] to two_points[1]
+    """
     return two_points[1] - two_points[0]
 
 
-# Generates normilized Gamma distributed value
-def generate_gamma():
+def max_pdf_gamma(k: float, theta: float) -> float:
+    """
+    Returns argmax value of Gamma dist
+    :param k: float, k param from Gamma dist
+    :param theta: float, theta param from Gamma dist
+    :return: float, argmax of Gamma dist
+    """
+    return (k - 1) * theta
+
+
+def generate_gamma_negative(k: float = 1 / 8, theta: float = 2.) -> float:
+    """
+    Generates gamma dist with shift on argmax value, i.e peak of our gamma dist is point_1
+    :param k: float, k param from Gamma dist
+    :param theta: float, theta param from Gamma dist
+    :return: float, generated coefficient with shifted gamma dist
+    """
+    s = np.random.gamma(k, theta, 1)[0]
+    s = s - max_pdf_gamma(k, theta)
+    # if (s > 20):  # normalization
+    #     s = 20
+    # s = s / 20
+    return s
+
+
+def generate_gamma() -> float:
+    """
+    Generates Gamma distributed value
+    :return: float,  generated coefficient with gamma dist
+    """
     shape, scale = 1., 3.
     s = np.random.gamma(shape, scale, 1)[0]
     # if (s > 20):  # заглушка пока что
@@ -105,7 +154,14 @@ def generate_gamma():
     return s
 
 
-def get_metrics(y_test, y_pred, aug_data, print_metrics=False):
+def get_metrics(y_test: pd.Series, y_pred: np.array, print_metrics: bool = False) -> dict:
+    """
+    Calculates metrics f1, precision, recall, AUC
+    :param y_test: pd.Series, y_true values
+    :param y_pred: np.array, y_pred values
+    :param print_metrics: bool, if print results or no
+    :return: dict, dictionary with calculated metrics
+    """
     f1 = f1_score(y_test.to_numpy().flatten(), y_pred)
     pr = precision_score(y_test.to_numpy().flatten(), y_pred, zero_division=0)
     re = recall_score(y_test.to_numpy().flatten(), y_pred)
@@ -115,49 +171,39 @@ def get_metrics(y_test, y_pred, aug_data, print_metrics=False):
                 'precision': 0 if pr is None else pr,
                 'recall': 0 if re is None else re,
                 'AUC_PR': 0 if auc_pr is None else auc_pr}
-    """
-    if aug_data == 'gamma':
-        dict_ans = {'f1_score_gamma': 0 if f1 is None else f1,
-                    'precision_gamma': 0 if pr is None else pr,
-                    'recall_gamma': 0 if re is None else re,
-                    'AUC_PR_gamma': 0 if auc_pr is None else auc_pr}
-    elif aug_data == 'no':
-        dict_ans = {'f1_score': 0 if f1 is None else f1,
-                    'precision': 0 if pr is None else pr,
-                    'recall': 0 if re is None else re,
-                    'AUC_PR': 0 if auc_pr is None else auc_pr}
-    elif aug_data == 'smote':
-        dict_ans = {'f1_score_smote': 0 if f1 is None else f1,
-                    'precision_smote': 0 if pr is None else pr,
-                    'recall_smote': 0 if re is None else re,
-                    'AUC_PR_smote': 0 if auc_pr is None else auc_pr}
-    """
 
     if print_metrics:
         print('F1_Score:', f1)
         print('Precision:', pr)
         print('Recall:', re)
         print('AUC_PR:', auc_pr)
-    # ans = np.array([f1, pr, re, auc_pr])
-    # ans[np.isnan(ans)] = 0
     return dict_ans
 
 
-# Generates new point on line between two initial points
-def generate_point_on_line(start_point, v, gamma_coeff):
+def generate_point_on_line(start_point: np.array, v: np.array, gamma_coeff: float) -> np.array:
+    """
+    Generates new point on line between two initial points
+    :param start_point: np.array, initial point
+    :param v: np.array, vector direction from point_1 to point_2
+    :param gamma_coeff: float, coefficient generated from gamma dist
+    :return: np.array, new generated point on line between point_1 and point_2
+    """
     return start_point + v * gamma_coeff
 
 
-# Generates n random points in hypercube [xy_min; xy_max]
-def generate_random_point_nd(num_points=2, n=10, min_=0, max_=10):
-    xy_min = [min_] * n
-    xy_max = [max_] * n
-    data = np.random.uniform(low=xy_min, high=xy_max, size=(num_points, n))
-    return data
-
-
-def generate_points_for_n_minority(minority_points, num_to_add, n_neighbors, k, theta, aug_data='gamma', tol=0.0000001,
-                                   testing=False):
+def generate_points_for_n_minority(minority_points: np.array, num_to_add: int, n_neighbors: int, k: float, theta: float,
+                                   aug_data: str = 'gamma') -> (
+        np.array, dict):
+    """
+    Makes augmentation of minority points
+    :param minority_points: np.array, array of all minority points
+    :param num_to_add: int, number of points needed to be generated
+    :param n_neighbors: int, number of neighbours
+    :param k: float, k param from Gamma dist
+    :param theta: float, theta param from Gamma dist
+    :param aug_data: str, mode of oversampling/undersampling
+    :return: (np.array, dict), returns concatenated initial + generated points and dict for testing
+    """
     n_features = minority_points.shape[1]
     dict_ans = defaultdict(lambda: np.array([]).reshape(0, n_features))
 
@@ -167,40 +213,24 @@ def generate_points_for_n_minority(minority_points, num_to_add, n_neighbors, k, 
         all_picked_x = np.random.randint(minority_points.shape[0], size=num_to_add)
         dist, all_neighs = neigh.kneighbors(minority_points[all_picked_x, :],
                                             n_neighbors, return_distance=True)
+        assert all_neighs.shape[1] == n_neighbors
         assert dist.shape[0] == num_to_add and all_neighs.shape[0] == num_to_add and len(all_picked_x) == num_to_add
-        dist, all_neighs = dist[:, 1:], all_neighs[:, 1:]
-        # assert np.all(dist > 0)
-        #   print('Retrain Neighbours')
-        #    dist, all_neighs = neigh.kneighbors(minority_points[all_picked_x, :],
-        #                                        n_neighbors+1, return_distance=True)
-        #    assert dist.shape[0] == num_to_add and all_neighs.shape[0] == num_to_add and len(all_picked_x) == num_to_add
-        #    dist, all_neighs = dist[:, 2:], all_neighs[:, 2:]
-        #    assert np.all(dist > 0)
+        dist, all_neighs = dist[:, 1:], all_neighs[:, 1:]  # remove first because closest Neighbour is the point itself
+        assert np.all(dist > 0)
 
-        all_picked_neighs = np.random.choice(range(len(all_neighs[1])), num_to_add, replace=True)
+        all_picked_neighs = np.random.choice(range(n_neighbors - 1), num_to_add, replace=True)
         assert len(all_picked_neighs) == num_to_add
 
-        all_pairs = []
-        i = 0
-        for picked_x, picked_neigh in zip(all_picked_x, all_picked_neighs):
-            all_pairs.append([picked_x, all_neighs[i][picked_neigh]])
-            if testing:
-                assert abs(
-                    distance(minority_points[picked_x], minority_points[all_neighs[i][picked_neigh]]) - dist[i][
-                        picked_neigh]) < tol
-            i += 1
-        all_pairs = np.array(all_pairs)
+        # Get pairs: [[picked_point, neigh], [...], ...]
+        # https://stackoverflow.com/questions/23435782/numpy-selecting-specific-column-index-per-row-by-using-a-list-of-indexes
+        all_pairs = np.array(list(zip(all_picked_x, all_neighs[np.arange(len(all_neighs)), all_picked_neighs])))
         assert all_pairs.shape[0] == num_to_add and all_pairs.shape[1] == 2
-
     else:
         # Choose random pairs with repetition:
         all_pairs = np.array(list(itertools.combinations(range(len(minority_points)), r=2)))
         rand_idx = np.random.choice(range(len(all_pairs)), num_to_add, replace=True)
         assert rand_idx.shape == (num_to_add,)
-        # print(rand_idx)
-        # print(all_comb)
         all_pairs = all_pairs[rand_idx]
-    # assert random_choice_minority.shape[0] == num_to_add and random_choice_minority.shape[1] == 2
     for i, (idx1, idx2) in enumerate(all_pairs):
         v = get_vector_two_points([minority_points[idx1], minority_points[idx2]])
         if aug_data == 'gamma':
@@ -220,23 +250,15 @@ def generate_points_for_n_minority(minority_points, num_to_add, n_neighbors, k, 
         minority_points = np.concatenate((minority_points, generated_point[np.newaxis, :]), axis=0)
         dict_ans[tuple(all_pairs[i])] = np.vstack([dict_ans[tuple(all_pairs[i])], generated_point])
 
-    return minority_points, dict_ans  # return concatenated initial+generated points and dict for testing
+    return minority_points, dict_ans
 
 
-def max_pdf_gamma(k, theta):
-    return (k - 1) * theta
-
-
-def generate_gamma_negative(k=1 / 8, theta=2.):
-    s = np.random.gamma(k, theta, 1)[0]
-    s = s - max_pdf_gamma(k, theta)  # shift by X axis
-    # if (s > 20):  # заглушка пока что
-    #     s = 20
-    # s = s / 20
-    return s
-
-
-def get_dataset_pd(name):
+def get_dataset_pd(name: str) -> (pd.DataFrame, pd.DataFrame):
+    """
+    Function Parses dataset from imblearn fetch_dataset() function or generates synthetic dataset
+    :param name: str, name of Dataset
+    :return: (pd.DataFrame, pd.DataFrame) Returns dataset X and target variable y
+    """
     if name == 'synthetic':
         x, y = generate_synthetic_dataset()
         return pd.DataFrame(x), y
@@ -246,8 +268,18 @@ def get_dataset_pd(name):
     return X, target
 
 
-def aug_train(X_temp, n_neighbors, k, theta, aug_data, testing=False):
-    # Подавать внутрь датафрейм X_temp с колонкой y
+def aug_train(X_temp: pd.DataFrame, n_neighbors: int, k: float, theta: float, aug_data: str,
+              testing: bool = False) -> pd.DataFrame:
+    """
+    Augmentation of train dataset
+    :param X_temp: pd.DataFrame,
+    :param n_neighbors: int, number of neighbours
+    :param k: float, k param from Gamma dist
+    :param theta: float, k param from Gamma dist
+    :param aug_data: str, mode of oversampling/undersampling
+    :param testing: bool, if needed to make tests or not
+    :return: pd.DataFrame, augmented training dataset
+    """
     num_zeros = X_temp[X_temp['y'] == 0].to_numpy().shape[0]
     num_ones = X_temp[X_temp['y'] == 1].to_numpy().shape[0]
 
@@ -282,9 +314,14 @@ def aug_train(X_temp, n_neighbors, k, theta, aug_data, testing=False):
     return df_new
 
 
-def get_NN(X):
+def get_NN(num_f: int) -> Sequential:
+    """
+    Creates instance of Neural Network
+    :param num_f: int, number of features in dataset
+    :return: Sequential, Neural Netwrok
+    """
     model = Sequential()
-    model.add(Dense(32, activation='relu', input_dim=X.shape[1]))
+    model.add(Dense(32, activation='relu', input_dim=num_f))
     model.add(Dense(1, activation='sigmoid'))
     model.compile(optimizer='adam',
                   loss='binary_crossentropy',
@@ -293,7 +330,15 @@ def get_NN(X):
     return model
 
 
-def get_number_success(df, index=4, step=4, num_modes=7):
+def get_number_success(df: pd.DataFrame, index: int = 4, step: int = 4, num_modes: int = 7) -> int:
+    """
+    Calculates number of successes, i.e when gamma augmentation outperformed another method
+    :param df: pd.DataFrame, DataFrame with all results and metrics
+    :param index: int, index where Gamma metrics start
+    :param step: int, distance from Gamma metrics to another method
+    :param num_modes: int, number of augmentation methods
+    :return: int, number of successes
+    """
     success = 0
     index_init = index
     try:
@@ -310,7 +355,11 @@ def get_number_success(df, index=4, step=4, num_modes=7):
     return success
 
 
-def generate_synthetic_dataset():
+def generate_synthetic_dataset() -> (np.array, np.array):
+    """
+    Generates synthetic dataset
+    :return: (np.array, np.array)
+    """
     # Create the minority points
     n_minority = 250
     x_min = np.linspace(0, 1000, n_minority)

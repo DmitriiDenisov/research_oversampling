@@ -1,37 +1,37 @@
 from time import time
-
+import pandas as pd
 from imblearn.over_sampling import SMOTE, RandomOverSampler, ADASYN
 from imblearn.under_sampling import RandomUnderSampler
 from keras.engine.sequential import Sequential
 from sklearn.neighbors import NearestNeighbors
 import numpy as np
 
-from utils.utils import get_dataset_pd, aug_train, get_metrics
+from utils.utils_py import get_dataset_pd, aug_train, get_metrics
 from sklearn.model_selection import KFold
 from sklearn.ensemble import RandomForestClassifier
 
 
-def handle_dataset(X: np.array,
-                   y: np.array,
+def handle_dataset(X: pd.DataFrame,
+                   y: pd.DataFrame,
                    dict_metrics: dict,
                    aug_data: str,
                    clf,
-                   k=1 / 8,
-                   theta=2.,
-                   num_folds=5,
-                   n_neighbours=5,
-                   ) -> object:
+                   k: float = 1 / 8,
+                   theta: float = 2.,
+                   num_folds: int = 5,
+                   n_neighbours: int = 5,
+                   ) -> (dict, int):
     """
-
+    Function creates implements cross validation with num_folds for X and y and stores all metrics
+    :param X: pd.DataFrame
+    :param y: np.
+    :param dict_metrics: dict, all stored metrics such as F1, precision, recall and so on
+    :param aug_data: str, mode for oversampling/undesampling
     :param clf:
-    :param k:
-    :param theta:
-    :param X:
-    :param y:
-    :param dict_metrics:
-    :param aug_data:
-    :param num_folds:
-    :param n_neighbours:
+    :param k: float, k param for gamma oversampling
+    :param theta: floa, theta param for gamma oversampling
+    :param num_folds: int, number of cross validation folds
+    :param n_neighbours: int, number of neighbours for gamma and smote+normal oversampling methods
     :return:
     """
     initial_folds_num = num_folds
@@ -71,7 +71,7 @@ def handle_dataset(X: np.array,
             y_pred = clf.predict(X_test)
             y_pred = np.around(y_pred)  # для нейронки
 
-            dict_temp = get_metrics(y_test, y_pred, aug_data)
+            dict_temp = get_metrics(y_test, y_pred)
             dict_temp['time_sec'] = time() - start_time
             dict_metrics = {k: dict_metrics.get(k, 0) + dict_temp.get(k, 0) for k in set(dict_metrics) | set(dict_temp)}
         if num_folds:  # in case every k-fold does not have at least two minority points
@@ -118,7 +118,7 @@ def handle_dataset(X: np.array,
             y_pred = clf.predict(X_test)
             y_pred = np.around(y_pred)  # для нейронки
 
-            dict_temp = get_metrics(y_test, y_pred, aug_data)
+            dict_temp = get_metrics(y_test, y_pred)
             dict_temp['time_sec'] = time() - start_time
             dict_metrics = {k: dict_metrics.get(k, 0) + dict_temp.get(k, 0) for k in set(dict_metrics) | set(dict_temp)}
         if num_folds:  # in case every k-fold does not have at least two minority points
@@ -169,7 +169,7 @@ def handle_dataset(X: np.array,
             y_pred = clf.predict(X_test)
             y_pred = np.around(y_pred)  # для нейронки
 
-            dict_temp = get_metrics(y_test, y_pred, aug_data)
+            dict_temp = get_metrics(y_test, y_pred)
             dict_temp['time_sec'] = time() - start_time
             dict_metrics = {k: dict_metrics.get(k, 0) + dict_temp.get(k, 0) for k in set(dict_metrics) | set(dict_temp)}
         if num_folds:  # in case every k-fold does not have at least two minority points

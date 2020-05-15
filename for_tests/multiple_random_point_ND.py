@@ -1,7 +1,8 @@
 import numpy as np
+
+from experiments.func_for_experiments import generate_random_point_nd
 from utils.tests_utils import test_points_on_line
-from utils.utils import get_vector_two_points, generate_gamma, generate_point_on_line, \
-    generate_random_point_nd
+from utils.utils_py import get_vector_two_points, generate_gamma, generate_point_on_line
 
 NUM_RAND_POINTS = 20
 N_FEATURES = 10

@@ -10,7 +10,7 @@ warnings.simplefilter(action='ignore', category=DeprecationWarning)
 
 from for_tests import multiple_random_point_ND, multiple_random_point_ND_generalized, one_random_point_ND
 from utils.handle_dataset import handle_dataset
-from utils.utils import get_dataset_pd
+from utils.utils_py import get_dataset_pd
 
 
 def test_1(capsys, caplog):

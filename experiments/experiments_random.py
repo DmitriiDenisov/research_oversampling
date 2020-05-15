@@ -3,7 +3,7 @@ import numpy as np
 from sklearn.ensemble import RandomForestClassifier
 
 from experiments.functions_for_random import get_random_gamma
-from utils.utils import get_dataset_pd
+from utils.utils_py import get_dataset_pd
 
 np.random.seed(46)
 

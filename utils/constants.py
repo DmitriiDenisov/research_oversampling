@@ -3,6 +3,7 @@ N_NEIGH = 3
 # K = 1 / 8
 # THETA = 2.
 MODES = ['initial', 'gamma', 'smote', 'smote+normal', 'ADASYN', 'OVERSAMP', 'UNDERSAMP']
+CLASSIFIERS = ['NN', 'DT', 'RF', 'SVC']
 # MODES = ['ADASYN', 'OVERSAMP', 'UNDERSAMP']
 COLUMNS = ['NAME_Dataset', 'Algo', 'N_neigh', 'NUM_elements',
            'minority_perc', 'Generated_points', 'NUM_fails', 'f1_score',

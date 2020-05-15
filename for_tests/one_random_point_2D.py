@@ -1,8 +1,11 @@
 import numpy as np
 import matplotlib.pyplot as plt
+
+from experiments.func_for_experiments import generate_random_point
+
 plt.style.use('seaborn-whitegrid')
 
-from utils.utils import generate_random_point, get_vector_two_points, generate_gamma, generate_point_on_line
+from utils.utils_py import get_vector_two_points, generate_gamma, generate_point_on_line
 
 # Generate two Random point2:
 two_points = generate_random_point(n=2, xy_min=[0, 0], xy_max=[10, 20])
